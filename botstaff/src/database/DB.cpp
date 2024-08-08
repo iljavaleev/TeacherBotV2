@@ -4,7 +4,6 @@
 static std::mutex bdmtx;
 using namespace TgBot;
 
-
 pqxx::result sql_transaction(const std::string& query, bool read_only)
 {
     std::lock_guard lk(bdmtx);
