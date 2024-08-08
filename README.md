@@ -11,7 +11,7 @@
 6. A student may request to cancel a class. A message with the request will be sent to the teacher. 
 
 
-## Запуск локально
+## Run locally
 1. Go to [ngrok.com](https://ngrok.com/), register if you don’t have an account yet.
 2. After logging in, go to the “Your Authtoken” tab and copy the token from there to the .env file in NGROK_AUTHTOKEN.
 3. Next, go to “Cloud Edge / Domains” and click “+ New Domain”.
