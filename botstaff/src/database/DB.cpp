@@ -36,13 +36,11 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
         std::cout << "Work is done successfully" << std::endl;
         c.close();
         return R;
-
     }   
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
-        return R;
-    }
+    }   
 }   
 
 
@@ -82,7 +80,7 @@ std::shared_ptr<UserLesson>  UserLesson::construct(const pqxx::row& res)
     user_lesson->objectives = res.at(5).as<std::string>();
     user_lesson->comment_for_pupil = res.at(6).as<std::string>();
     user_lesson->comment_for_teacher = res.at(7).as<std::string>();
-    user_lesson->comment_for_teacher = res.at(8).as<std::string>();
+    user_lesson->comment_for_parent = res.at(8).as<std::string>();
     user_lesson->is_paid = res.at(9).as<bool>();
     return user_lesson;
 }
@@ -277,9 +275,9 @@ std::shared_ptr<BotUser> BotUser::create_pupil()
 const std::string UserLesson::_get = "SELECT * FROM user_lesson WHERE id={};";
 const std::string UserLesson::_get_all = "SELECT * FROM user_lesson;";
 const std::string UserLesson::_update = "UPDATE user_lesson SET \
-id=DEFAULT, date='{}', time='{}', teacher={}, pupil = {}, objectives = '{}', \
-comment_for_pupil = '{}', comment_for_teacher = '{}', \
-comment_for_parent = '{}', is_paid = {} WHERE id = {} RETURNING *";
+date='{}', time='{}', teacher={}, pupil={}, objectives ='{}', \
+comment_for_pupil='{}', comment_for_teacher ='{}', \
+comment_for_parent='{}', is_paid ={} WHERE id={} RETURNING *";
 const std::string UserLesson::_create = "INSERT INTO user_lesson VALUES \
 (DEFAULT, '{}', '{}', {}, {}, '{}', '{}', '{}', '{}', {}) RETURNING *;";
 const std::string UserLesson::_destroy = "DELETE FROM user_lesson \
@@ -407,11 +405,13 @@ std::string LessonInfo::get_info_for_teacher()
         "<b>Pupil: {}</b>\n"
         "<b>Class start time: {}</b>\n"
         "<b>Objectives</b>: {}\n"
-        "<b>Comments for teacher</b>: {}", 
+        "<b>Comments for teacher</b>:\n{}\n",
+        "<b>Payment status</b>: {}", 
         pupil,
         time, 
         objectives, 
-        comment_for_teacher
+        comment_for_teacher,
+        is_paid
     );
 };
 
@@ -421,7 +421,7 @@ std::string LessonInfo::get_info_for_pupil()
         "<b>Teacher {}</b>\n"
         "<b>Class start time: {}</b>\n"
         "<b>Objectives</b>: {}\n"
-        "<b>Comments for student</b>: {}", 
+        "<b>Comments for student</b>:\n{}", 
         teacher,
         time, 
         objectives, 
@@ -436,7 +436,7 @@ std::string LessonInfo::get_info_for_parent()
         "<b>Date</b>: {}\n"
         "<b>Class start time: {}</b>\n"
         "<b>Objectives</b>: {}\n"
-        "<b>Comments for parent</b>: {}\n"
+        "<b>Comments for parent</b>:\n{}\n"
         "<b>Payment status</b>: {}", 
         teacher,
         date,
@@ -451,15 +451,15 @@ std::string LessonInfo::get_full_info()
 {
     return std::format(
         "<b>ID: {}</b>\n"
-        "<b>Teacher {}</b>\n"
-        "<b>Pupil {}</b>\n"
-        "<b>Date</b>: {}\n"
-        "<b>Class start time: {}</b>\n"
-        "<b>Objectives</b>: {}\n"
-        "<b>Comments for parent</b>: {}\n"
-        "<b>Comments for student</b>: {}\n"
-        "<b>Comments for teacher</b>: {}\n" 
-        "<b>Статус оплаты</b>: {}",
+        "<b><u>Teacher</u>: {}</b>\n"
+        "<b><u>Pupil</u>: {}</b>\n"
+        "<b><u>Date</u></b>: {}\n"
+        "<b><u>Class start time</u>: {}</b>\n"
+        "<b><u>Objectives</u></b>: {}\n"
+        "<b><u>Comments for parent</u></b>:\n{}\n"
+        "<b><u>Comments for student</u></b>:\n{}\n"
+        "<b><u>Comments for teacher</u></b>:\n{}\n" 
+        "<b><u>Payment status</u></b>: {}",
         id,
         teacher,
         pupil, 
@@ -467,8 +467,8 @@ std::string LessonInfo::get_full_info()
         time,
         objectives,
         comment_for_parent,
-        comment_for_teacher,
         comment_for_pupil,
+        comment_for_teacher,
         is_paid
     );
 }
@@ -602,7 +602,7 @@ std::string get_comment_text(int id)
     std::string comment_for_teacher{it->at(3).as<std::string>()};
     
     return std::format(
-        "<b>Ученик: {} {}</b>\n<b>Дата: {}</b>\n\n<b>Ваш комментарий</b>: {}\n", 
+        "<b>Student: {} {}</b>\n<b>Date: {}</b>\n\n<b>Your comments</b>: {}\n", 
         date, first_name, last_name, comment_for_teacher);
 }
 
@@ -611,10 +611,10 @@ std::string get_pupil_info(const TgBot::Message::Ptr& message)
     auto u = BotUser::get(message->chat->id);
     return std::format(
         "<b>{} {} {}</b>\n\
-        <b>Юзернэйм</b>: {}\n\
-        <b>Указан телефон</b>: {}\n\
-        <b>Адрес электронной почты</b>:{}\n\
-        <b>Комментарий:</b>{}", 
+        <b>Username</b>: {}\n\
+        <b>Phone number</b>: {}\n\
+        <b>Email address</b>:{}\n\
+        <b>Comments:</b>{}", 
         u->first_name, 
         u->last_name, 
         u->cls, 
@@ -692,7 +692,7 @@ std::string get_user_lesson_info(
 {   
     std::shared_ptr<UserLesson> user_lesson = UserLesson::get(user_lesson_id);
     if (!user_lesson->id)
-        return "Произошла ошибка, повторите позднее";
+        return "Error, try again later";
     LessonInfo info(user_lesson);
     if (role == bot_roles::teacher or role == bot_roles::admin)
         return info.get_info_for_teacher();

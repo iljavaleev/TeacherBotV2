@@ -52,24 +52,25 @@ int main() {
     
     bot.getEvents().onCallbackQuery(Handlers::start_register_handler(bot));
     bot.getEvents().onNonCommandMessage(Handlers::user_registration_handler(bot));
-    bot.getEvents().onCallbackQuery(Handlers::start_lesson_creation_handler(bot));
-    bot.getEvents().onNonCommandMessage(Handlers::lesson_creation_handler(bot));
+    
+    bot.getEvents().onCallbackQuery(lesson::start_lesson_creation_handler(bot));
+    bot.getEvents().onNonCommandMessage(lesson::lesson_creation_handler(bot));
     bot.getEvents().onNonCommandMessage(
-        Handlers::get_message_data_for_lesson_update_handler(bot)
+        lesson::get_message_data_for_lesson_update_handler(bot)
     );
 
-    bot.getEvents().onCallbackQuery(teacherHandlers::list_active_not_handler(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::list_all_teachers_handler(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::list_comments_handler(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::list_teachers_handler(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::list_user_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::list_active_not_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::list_all_teachers_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::list_comments_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::list_teachers_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::list_user_handler(bot));
 
-    bot.getEvents().onCallbackQuery(teacherHandlers::activate_user(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::delete_user(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::activate_user(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::delete_user(bot));
      
-    bot.getEvents().onCallbackQuery(teacherHandlers::update_user(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::user_info_handler(bot));
-    bot.getEvents().onCallbackQuery(teacherHandlers::comment_text_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::update_user(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::user_info_handler(bot));
+    bot.getEvents().onCallbackQuery(teacher_handlers::comment_text_handler(bot));
     
     bot.getEvents().onCallbackQuery(UserHandlers::user_start_handler(bot));
     bot.getEvents().onCallbackQuery(Handlers::agree_handler(bot));
@@ -78,12 +79,15 @@ int main() {
     bot.getEvents().onCallbackQuery(Handlers::calendar_day_handler(bot));
     bot.getEvents().onCallbackQuery(Handlers::day_info_handler(bot));
     bot.getEvents().onCallbackQuery(
-        Handlers::choose_pupil_for_lesson_creation_handler(bot)
+        lesson::choose_pupil_for_lesson_creation_handler(bot)
     );
-    bot.getEvents().onCallbackQuery(Handlers::start_lesson_update_handler(bot));
-    bot.getEvents().onCallbackQuery(Handlers::lesson_update_state_handler(bot));
+    bot.getEvents().onCallbackQuery(lesson::start_lesson_update_handler(bot));
+    bot.getEvents().onCallbackQuery(lesson::lesson_update_state_handler(bot));
     bot.getEvents().onCallbackQuery(
-        Handlers::get_query_data_for_lesson_update_handler(bot)
+        lesson::get_query_data_for_lesson_update_handler(bot)
+    );
+    bot.getEvents().onCallbackQuery(
+        lesson::delete_lesson_handler(bot)
     );
     
         

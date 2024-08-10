@@ -1,6 +1,7 @@
 #ifndef LessonCreation_hpp
 #define LessonCreation_hpp
-#include "Headers.hpp"
+
+#include "botstaff/FSM/Headers.hpp"
 #include <functional>
 #include <unordered_map>
 
@@ -9,7 +10,7 @@ using namespace TgBot;
 namespace lesson_messges
 {
     inline std::string _date = "Choose new date for class";
-    inline std::string _pupil = "Choose pupil for this lesson";
+    inline std::string _pupil = "Choose student for this lesson";
     inline std::string _time = 
         "Set lesson start time (like 12 00, 12-00, etc)";
     inline std::string _objectives = 
@@ -33,7 +34,7 @@ inline std::unordered_map<std::string, std::string> lesson_creation_messages =
     {"comment_for_pupil", lesson_messges::_comments_for_pupil},
     {"comment_for_teacher", lesson_messges::_comments_for_teacher},
     {"comment_for_parent", lesson_messges::_comments_for_parent},
-    {"paid", lesson_messges::_paid},
+    {"is_paid", lesson_messges::_paid},
     {"finish_lesson_update", lesson_messges::_finish}
 };
 
@@ -109,7 +110,12 @@ public:
             bot(_bot),
             lesson_info(_lesson)
     {}
-    std::shared_ptr<UserLesson> get_instance(){ return lesson_info->lesson; }
+    std::shared_ptr<UserLesson> get_instance()
+    { 
+        lesson_info->print();
+        lesson_info->lesson->print();
+        return lesson_info->lesson; 
+    }
     void done();
     void change_state(const std::string& message);
     void run(const std::string& message);

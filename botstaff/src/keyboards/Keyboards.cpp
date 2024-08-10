@@ -305,7 +305,7 @@ namespace Keyboards
             InlineKeyboardButton::Ptr delete_lesson_btn(
                 new InlineKeyboardButton
             );
-            delete_lesson_btn->text = "Cancel";
+            delete_lesson_btn->text = "Delete";
             delete_lesson_btn->callbackData = std::format(
                 "delete_lesson {}", 
                 lesson_id

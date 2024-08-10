@@ -68,7 +68,6 @@ namespace sql
         )
     {
         std::string q = create_query(query, args...);
-        std::cout << q << std::endl;
         pqxx::result res = sql_transaction(q, false);
         return T::construct(*res.begin());
     }
@@ -79,10 +78,11 @@ namespace sql
         PK pk
         )
     {
-        if(!get<T>(query, pk))
+        if(!get<T>(T::_get, pk))
             return nullptr;
         std::string q = create_query(query, pk);
         pqxx::result res = sql_transaction(q, false);
+
         return T::construct(*res.begin());
     }
 
@@ -221,6 +221,20 @@ struct UserLesson{
     std::shared_ptr<UserLesson> destroy();
     std::shared_ptr<UserLesson> update();
     std::shared_ptr<UserLesson> create();
+
+    void print()
+    {
+        std::cout << id << std::endl;
+        std::cout << date << std::endl;
+        std::cout << time << std::endl;
+        std::cout << teacher << std::endl;
+        std::cout << pupil << std::endl;
+        std::cout << objectives << std::endl;
+        std::cout << comment_for_pupil << std::endl;
+        std::cout << comment_for_parent << std::endl;
+        std::cout << comment_for_teacher << std::endl;
+        std::cout << is_paid << std::endl;
+    }
 };
 
 struct LessonInfo
@@ -281,6 +295,19 @@ struct LessonInfo
     void set_comment_for_pupil(const std::string& comment_for_pupil);
     void set_comment_for_parent(const std::string& comment_for_parent);
     void set_comment_for_teacher(const std::string& comment_for_teacher);
+    void print()
+    {
+        std::cout << id << std::endl;
+        std::cout << date << std::endl;
+        std::cout << time << std::endl;
+        std::cout << teacher << std::endl;
+        std::cout << pupil << std::endl;
+        std::cout << objectives << std::endl;
+        std::cout << comment_for_pupil << std::endl;
+        std::cout << comment_for_parent << std::endl;
+        std::cout << comment_for_teacher << std::endl;
+        std::cout << is_paid << std::endl;
+    }
 };
 
 
@@ -296,8 +323,6 @@ std::vector<std::vector<std::string>> get_lessons_by_day(
     long chat_id, 
     const bot_roles& role
 );
-// std::shared_ptr<BotUser> construct_user(const pqxx::row& res);
-// std::shared_ptr<UserLesson> construct_user_lesson(const pqxx::row& res);
 
 
 std::string get_comment_text(int id);

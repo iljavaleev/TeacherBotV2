@@ -383,7 +383,8 @@ void UpdateLesson::run(const std::string& message)
 
 void UpdateLesson::change_state(const std::string& message)
 {
-    state = states.at(message);
+    if(states.contains(message))
+        state = states.at(message);
 }
 
 typedef void (UpdateLesson::*callable)(const std::string&);
@@ -394,5 +395,6 @@ std::unordered_map<std::string, callable> UpdateLesson::states = {
     { "time",  &UpdateLesson::set_time },
     { "comment_for_pupil", &UpdateLesson::comments_for_pupil },
     {"comment_for_teacher",  &UpdateLesson::comments_for_teacher },
-    {"comment_for_parent", &UpdateLesson::comments_for_parent }
+    {"comment_for_parent", &UpdateLesson::comments_for_parent },
+    {"is_paid", &UpdateLesson::is_paid }
 };

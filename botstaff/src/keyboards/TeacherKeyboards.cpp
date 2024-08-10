@@ -335,7 +335,8 @@ namespace teacherKeyboards
             new InlineKeyboardButton
         );
         update_lesson_objectives_btn->text = "Change objectives";
-        update_lesson_objectives_btn->callbackData = "update_lesson_field objectives";
+        update_lesson_objectives_btn->callbackData = 
+            "update_lesson_field objectives";
         row.push_back(update_lesson_objectives_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
@@ -344,9 +345,9 @@ namespace teacherKeyboards
         InlineKeyboardButton::Ptr update_lesson_pupil_comments_btn(
             new InlineKeyboardButton
         );
-        update_lesson_pupil_comments_btn->text = "Change "
-        "comments for pupil";
-        update_lesson_pupil_comments_btn->callbackData = "update_lesson_field comment_for_pupil";
+        update_lesson_pupil_comments_btn->text = "Change comments for pupil";
+        update_lesson_pupil_comments_btn->callbackData = "update_lesson_field" 
+            " comment_for_pupil";
         row.push_back(update_lesson_pupil_comments_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
@@ -355,7 +356,7 @@ namespace teacherKeyboards
             new InlineKeyboardButton
         );
         update_lesson_teacher_comments_btn->text = "Change coments"
-        " for teacher";
+            " for teacher";
         update_lesson_teacher_comments_btn->callbackData = 
             "update_lesson_field comment_for_teacher";
         row.push_back(update_lesson_teacher_comments_btn);
@@ -366,18 +367,27 @@ namespace teacherKeyboards
             new InlineKeyboardButton
         );
         update_lesson_parent_comments_btn->text = "Change coments"
-        " for parent";
+            " for parent";
         update_lesson_parent_comments_btn->callbackData = 
             "update_lesson_field comment_for_parent";
         row.push_back(update_lesson_parent_comments_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
+        InlineKeyboardButton::Ptr update_lesson_is_paid_btn(
+            new InlineKeyboardButton
+        );
+        update_lesson_is_paid_btn->text = "Change payment status";
+        update_lesson_is_paid_btn->callbackData = "update_lesson_field is_paid";
+        row.push_back(update_lesson_is_paid_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        row.clear();
+
         InlineKeyboardButton::Ptr finish_update_btn(new InlineKeyboardButton);
         finish_update_btn->text = "Finish editing";
-        finish_update_btn->callbackData = std::format("update_lesson_field "
-        "finish_lesson_update", 
-        lesson_id
+        finish_update_btn->callbackData = std::format("update_lesson_field"
+            " finish_lesson_update", 
+            lesson_id
         );
         row.push_back(finish_update_btn);
         keyboard->inlineKeyboard.push_back(row);

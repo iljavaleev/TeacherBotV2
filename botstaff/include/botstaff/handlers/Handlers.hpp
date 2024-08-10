@@ -46,13 +46,6 @@ namespace Handlers
         Message::Ptr operator()(const Message::Ptr&);
     };
 
-    class lesson_creation_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        lesson_creation_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const Message::Ptr&);
-    };
 
     class start_register_handler
     {
@@ -62,42 +55,7 @@ namespace Handlers
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-    class start_lesson_creation_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        start_lesson_creation_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
-
-
-    class choose_pupil_for_lesson_creation_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        choose_pupil_for_lesson_creation_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
-
-    class lesson_update_state_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        lesson_update_state_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
-
-    class start_lesson_update_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        start_lesson_update_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
-
+   
     class agree_handler
     {
         const TgBot::Bot& bot;
@@ -136,21 +94,7 @@ namespace Handlers
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
     
-    class get_message_data_for_lesson_update_handler{
-        const TgBot::Bot& bot;
-    public:
-        get_message_data_for_lesson_update_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const Message::Ptr&);
-    };
-
-     class get_query_data_for_lesson_update_handler{
-        const TgBot::Bot& bot;
-    public:
-        get_query_data_for_lesson_update_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
-    };
+   
 };
 
 void startWebhook(TgBot::Bot& bot, std::string& webhookUrl);

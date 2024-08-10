@@ -7,7 +7,7 @@ using namespace TgBot;
 using namespace std;
 
 
-namespace teacherHandlers
+namespace teacher_handlers
 {
     class list_all_teachers_handler{
         const TgBot::Bot& bot;
@@ -80,50 +80,69 @@ namespace teacherHandlers
     };
 }
 
-namespace createLesson
+namespace lesson
 {
-    class create_lesson_handler{
+    class lesson_creation_handler
+    {
         const TgBot::Bot& bot;
     public:
-        create_lesson_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        lesson_creation_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const Message::Ptr&);
     };
-
-    class lesson_update_handler{
+    
+     class start_lesson_creation_handler
+    {
         const TgBot::Bot& bot;
     public:
-        lesson_update_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        start_lesson_creation_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-    class lesson_pupil_handler{
+
+    class choose_pupil_for_lesson_creation_handler
+    {
         const TgBot::Bot& bot;
     public:
-        lesson_pupil_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        choose_pupil_for_lesson_creation_handler(
+            const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-    class lesson_day_date_handler{
+    class lesson_update_state_handler
+    {
         const TgBot::Bot& bot;
     public:
-        lesson_day_date_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        lesson_update_state_handler(
+            const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-    class update_lesson_pupil_handler{
+    class start_lesson_update_handler
+    {
         const TgBot::Bot& bot;
     public:
-        update_lesson_pupil_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        start_lesson_update_handler(
+            const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-    class lesson_delete_request{
+     class get_message_data_for_lesson_update_handler{
         const TgBot::Bot& bot;
     public:
-        lesson_delete_request(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        get_message_data_for_lesson_update_handler(
+            const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const Message::Ptr&);
     };
 
+     class get_query_data_for_lesson_update_handler{
+        const TgBot::Bot& bot;
+    public:
+        get_query_data_for_lesson_update_handler(
+            const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+    
+    
     class delete_lesson_handler{
         const TgBot::Bot& bot;
     public:
