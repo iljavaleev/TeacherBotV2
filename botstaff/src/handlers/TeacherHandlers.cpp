@@ -84,6 +84,92 @@ namespace teacher_handlers
         return Message::Ptr(nullptr);
     }
 
+    Message::Ptr list_debts_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if (query->data == "debts")
+        {
+            std::thread send(
+                send_message_with_kb,
+                std::ref(bot),
+                query->message->chat->id,
+                "List of student debts",
+                teacherKeyboards::create_debts_kb(
+                        query->message->chat->id
+                    ),
+                "HTML" 
+            );
+            send.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
+
+    Message::Ptr change_payment_status_request_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if (StringTools::startsWith(query->data, "debt_info"))
+        {
+            int lesson_id(std::stoi(
+                StringTools::split(query->data, ' ').at(1))
+            );
+            printf("HERE\n");
+            std::thread send(
+                send_message_with_kb,
+                std::ref(bot),
+                query->message->chat->id,
+                "Change payment status?",
+                teacherKeyboards::change_payment_status(lesson_id),
+                "HTML" 
+            );
+            send.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
+     Message::Ptr change_payment_status_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if (StringTools::startsWith(query->data, "change_debt"))
+        {
+            auto data = StringTools::split(query->data, ' ');
+            
+            std::string answ = data.at(1);
+            int lesson_id(std::stoi(data.at(2)));
+            std::string mess;
+            if(answ == "yes")
+            {
+                mess = "Satus was changed successfully";
+            }
+            else
+            {
+                mess = "Ok";
+            };
+            try
+            {
+                change_debt_status(lesson_id);
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+                mess = "Somthing went wrong, try later";
+            }
+
+            std::thread send(
+                send_message,
+                std::ref(bot),
+                query->message->chat->id,
+                mess,
+                "HTML" 
+            );
+            send.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
     Message::Ptr list_all_teachers_handler::operator()(
         const CallbackQuery::Ptr& query
     )
@@ -271,27 +357,6 @@ namespace teacher_handlers
         }
         return Message::Ptr(nullptr);
     }
-
-    Message::Ptr update_user::operator()(const CallbackQuery::Ptr& query)
-    {
-        if(StringTools::split(query->data, ' ').at(0) == "update_user")
-        {   
-            auto info = StringTools::split(query->data, ' ');
-            long user_id{std::stol(info.at(2))};
-            bot_roles role = static_cast<bot_roles>(std::stoi(info.at(1)));
-            std::thread send(
-                send_message_with_kb,
-                std::ref(bot),
-                query->message->chat->id, 
-                "Choose what you want to update",
-                teacherKeyboards::update_user_info_kb(role, user_id),
-                "HTML"  
-            );
-            send.detach();
-        }
-        return Message::Ptr(nullptr);
-    }
-
 }
 
 namespace lesson

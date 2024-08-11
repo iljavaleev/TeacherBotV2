@@ -1,5 +1,6 @@
 #include "botstaff/database/DB.hpp"
 #include "botstaff/database/Quiries.hpp"
+#include <stdexcept>
 
 static std::mutex bdmtx;
 using namespace TgBot;
@@ -49,7 +50,7 @@ std::shared_ptr<BotUser> BotUser::construct(const pqxx::row& res)
     std::shared_ptr<BotUser> user(new BotUser());
     if (res.empty())
         return user;
-    if (res.at(9).as<std::string>() == "pupil")
+    if (res.at(9).as<int>() == 0)
     {
         user->teacher = res.at(1).as<long>();
         user->cls = res.at(7).as<std::string>();
@@ -148,7 +149,7 @@ std::shared_ptr<BotUser> BotUser::update(
 {
     return sql::create_update<BotUser>(
         BotUser::_update, 
-        teacher,
+        teacher ? std::to_string(teacher) : "null",
         tgusername,
         first_name,
         last_name,
@@ -223,7 +224,7 @@ std::shared_ptr<BotUser> BotUser::update()
 {
     return sql::create_update<BotUser>(
         BotUser::_update, 
-        teacher,
+        teacher ? std::to_string(teacher) : "null",
         tgusername,
         first_name,
         last_name,
@@ -271,6 +272,40 @@ std::shared_ptr<BotUser> BotUser::create_pupil()
         is_active
     );
 }
+
+std::string BotUser::get_full_info(const bot_roles& role)
+{   
+    if (role == bot_roles::pupil)
+        return std::format(
+            "<b><u>{} {}</u></b>\n"
+            "<b><u>Class</u></b>: {}\n"
+            "<b><u>Phone</u></b>: {}\n"
+            "<b><u>Email</u></b>: {}\n"
+            "<b><u>Status</u></b>: {}\n"
+            "<b><u>Comment</u></b>:\n{}", 
+            first_name,
+            last_name,
+            cls, 
+            phone, 
+            email,
+            is_active ? "active" : "not active",
+            comment
+        );
+    return std::format(
+            "<b><u>{} {}</u></b>\n"
+            "<b><u>Phone</u></b>: {}\n"
+            "<b><u>Email</u></b>: {}\n"
+            "<b><u>Status</u></b>: {}\n"
+            "<b><u>Comment</u></b>:\n{}", 
+            first_name,
+            last_name,
+            phone, 
+            email,
+            is_active ? "active" : "not active",
+            comment
+        );
+}
+
 
 const std::string UserLesson::_get = "SELECT * FROM user_lesson WHERE id={};";
 const std::string UserLesson::_get_all = "SELECT * FROM user_lesson;";
@@ -641,7 +676,6 @@ void get_comments_for_kb(InlineKeyboardMarkup::Ptr kb, long chat_id)
         std::string date{it->at(1).as<std::string>()};
         std::string first_name{it->at(2).as<std::string>()};
         std::string last_name{it->at(3).as<std::string>()};
-        
         std::vector<InlineKeyboardButton::Ptr> row;
         InlineKeyboardButton::Ptr comment_btn(new InlineKeyboardButton);
         comment_btn->text = std::format(
@@ -658,6 +692,40 @@ void get_comments_for_kb(InlineKeyboardMarkup::Ptr kb, long chat_id)
         kb->inlineKeyboard.push_back(row);
     }
 }
+
+void get_debts_for_kb(InlineKeyboardMarkup::Ptr kb, long chat_id)
+{
+    std::vector<InlineKeyboardButton::Ptr> row;
+    
+    std::string query = create_query(
+        other_quiries::_get_debts_for_kb, chat_id
+    ); 
+    
+    pqxx::result R = sql_transaction(query); 
+
+    for (auto it{R.begin()}; it!=R.end(); ++it)
+    {
+        long id{it->at(0).as<long>()};
+        std::string date{it->at(1).as<std::string>()};
+        std::string first_name{it->at(2).as<std::string>()};
+        std::string last_name{it->at(3).as<std::string>()};
+        std::vector<InlineKeyboardButton::Ptr> row;
+        InlineKeyboardButton::Ptr comment_btn(new InlineKeyboardButton);
+        comment_btn->text = std::format(
+            "{} {} {}", 
+            date, 
+            first_name, 
+            last_name
+        );
+        comment_btn->callbackData = std::format(
+            "debt_info {}", 
+            id
+        );
+        row.push_back(comment_btn);
+        kb->inlineKeyboard.push_back(row);
+    }
+}
+
 
 void get_users_for_kb(
     InlineKeyboardMarkup::Ptr kb,
@@ -702,3 +770,17 @@ std::string get_user_lesson_info(
         return info.get_info_for_parent();
     return std::string{};
 }
+
+void change_debt_status(long lesson_id)
+{
+    try
+    {
+         sql_transaction(create_query(
+            other_quiries::_change_debt_status, lesson_id
+        ));
+    }
+    catch(const std::exception& e)
+    {
+        throw std::runtime_error(e.what());
+    }
+}   

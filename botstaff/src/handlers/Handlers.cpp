@@ -16,32 +16,25 @@
 #include "botstaff/keyboards/UserKeyboards.hpp"
 #include "botstaff/utils/Utils.hpp"
 #include "botstaff/Vocabular.hpp"
+
 #include <thread>
 
 #include <tgbot/tgbot.h>
-
+#include "botstaff/handlers/TeacherHandlers.hpp"
+#include "botstaff/handlers/UserHandlers.hpp"
 
 using namespace TgBot;
 
-std::unordered_map<long, std::shared_ptr<UserRegistration>> 
-    user_registration_state;
-extern RegistrationFilter rf;
 
-void clear_user_state(long user_id)
-{
-    if (user_registration_state.contains(user_id))
-    {
-        user_registration_state.erase(user_id);
-    }
-}
-
-namespace CommandHandlers
+namespace command_handlers
 {
     Message::Ptr start_command::operator()(const Message::Ptr& message)
     {
         long chat_id(message->chat->id);
         clear_user_state(chat_id);
         clear_lesson_state(chat_id);
+        clear_lesson_update_state(chat_id);
+        clear_lesson_update_state(chat_id);
         bot_roles role = get_role(chat_id);
         
         std::string mes;
@@ -85,6 +78,8 @@ namespace CommandHandlers
         long chat_id(message->chat->id);
         clear_user_state(chat_id);
         clear_lesson_state(chat_id);
+        clear_lesson_update_state(chat_id);
+        clear_lesson_update_state(chat_id);
         std::thread send(
             send_message,
             std::ref(bot), 
@@ -98,83 +93,8 @@ namespace CommandHandlers
 }
 
 
-namespace Handlers
+namespace handlers
 {
-    Message::Ptr user_registration_handler::operator()(
-        const Message::Ptr& message
-    )
-    {
-        if(!user_registration_state.contains(message->chat->id))
-            return Message::Ptr(nullptr);
-        std::shared_ptr<UserRegistration> ur = 
-            user_registration_state.at(message->chat->id);
-
-        std::thread t{&UserRegistration::run, ur, std::ref(message->text)};
-        t.detach();
-        
-        return Message::Ptr(nullptr);
-    }
-
-
-    Message::Ptr start_register_handler::operator()(
-        const CallbackQuery::Ptr& query
-    )
-    {
-        if(query->data != "register")
-            return Message::Ptr(nullptr);
-        std::shared_ptr<UserRegistration> ur = 
-        std::make_shared<UserRegistration>(
-            rf.get_sender(),
-            std::ref(bot), 
-            query->message->chat->id, 
-            query->message->chat->username
-        );
-        user_registration_state.emplace(query->message->chat->id, ur);        
-        std::thread send(
-                send_message,
-                std::ref(bot),
-                query->message->chat->id,
-                "Enter your name",
-                "HTML"
-            );
-        send.detach();
-        return Message::Ptr(nullptr);
-    }
-
-    
-
-    Message::Ptr agree_handler::operator()(
-        const CallbackQuery::Ptr& query
-    )
-    {
-        auto res = Message::Ptr(nullptr);
-        
-        if(!StringTools::startsWith(query->data, "agreement"))
-            return res;
-
-        if(query->data == "agreement_yes")
-        {
-            std::shared_ptr<UserRegistration> ur = 
-            user_registration_state.at(query->message->chat->id);
-   
-            std::thread t{&UserRegistration::run, ur, std::ref(query->data)};
-            t.detach();
-       }
-       else
-       {
-            std::thread send(
-                send_message,
-                std::ref(bot),
-                query->message->chat->id,
-                "<b>Registration is not completed<\b>", 
-                "HTML"
-            );
-            send.detach();
-       }     
-        user_registration_state.erase(query->message->chat->id);
-        return Message::Ptr(nullptr); 
-    }
-
     Message::Ptr calendar_handler::operator()(const CallbackQuery::Ptr& query)
     {
        if (StringTools::split(query->data, ' ').at(0) == "calendar") 

@@ -5,6 +5,32 @@
 
 using namespace TgBot;
 
+
+namespace user_reg_messages
+{
+    inline std::string _first_name = "Enter name";
+    inline std::string _last_name = "Enter surname";
+    inline std::string _class = "Set student's class";
+    inline std::string _phone = "Set phone number";
+    inline std::string _email= "Set email address";
+    inline std::string _comments = "Enter comments about student";
+    inline std::string _status = "Activate user? y/n";
+    inline std::string _finish = "Editing was comleted";
+}
+
+inline std::unordered_map<std::string, std::string> user_update_messages = 
+{
+    {"first_name", user_reg_messages::_first_name},
+    {"last_name", user_reg_messages::_last_name},
+    {"class", user_reg_messages::_class},
+    {"phone", user_reg_messages::_phone},
+    {"email", user_reg_messages::_email},
+    {"comments", user_reg_messages::_comments},
+    {"status", user_reg_messages::_status},
+    {"finish", user_reg_messages::_finish}
+};
+
+
 class UserRegistration
 {
     messaging::receiver messanger;
@@ -43,6 +69,56 @@ public:
     void done();
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }
+};
+
+
+class UpdateUser
+{
+    messaging::receiver messanger;
+    messaging::sender filter_sender;
+    std::shared_ptr<BotUser> user;
+    long teacher_id;
+    void (UpdateUser::* state)(const std::string&);
+    const TgBot::Bot& bot;
+    
+    typedef void (UpdateUser::*callable)(const std::string&);
+    static std::unordered_map<std::string, callable> states;
+    
+    void change_first_name(const std::string& name);
+    void change_last_name(const std::string& name);
+    void change_class(const std::string& cls);
+    void change_phone(const std::string& phone);
+    void change_email(const std::string& email);
+    void change_comment(const std::string& comment);
+    void change_active_status(const std::string& status);
+
+    void send_update_kb();
+    void send_error_msg(const std::string msg = 
+        "You entered incorrect information");
+    
+    UpdateUser(const UpdateUser&) = delete;
+    UpdateUser& operator=(const UpdateUser&) = delete;
+public:
+    UpdateUser(
+        const messaging::sender& _fs,
+        const TgBot::Bot& _bot,
+        std::shared_ptr<BotUser> _user,
+        long _teacher_id
+        ):
+            filter_sender(_fs),
+            bot(_bot),
+            user(_user),
+            teacher_id(_teacher_id)
+    {}
+    std::shared_ptr<BotUser> get_instance()
+    { 
+        return user; 
+    }
+    void done();
+    void change_state(const std::string& message);
+    void run(const std::string& message);
+    messaging::sender get_sender(){ return messanger; }
+  
 };
 
 #endif

@@ -6,6 +6,8 @@
 using namespace TgBot;
 using namespace std;
 
+void clear_lesson_state(long user_id);
+void clear_lesson_update_state(long user_id);
 
 namespace teacher_handlers
 {
@@ -58,13 +60,6 @@ namespace teacher_handlers
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
 
-    class update_user{
-        const TgBot::Bot& bot;
-    public:
-        update_user(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
-    };
-
     class comment_text_handler{
         const TgBot::Bot& bot;
     public:
@@ -78,6 +73,28 @@ namespace teacher_handlers
         list_comments_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
+
+    class list_debts_handler{
+        const TgBot::Bot& bot;
+    public:
+        list_debts_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+    class change_payment_status_request_handler{
+        const TgBot::Bot& bot;
+    public:
+        change_payment_status_request_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+     class change_payment_status_handler{
+        const TgBot::Bot& bot;
+    public:
+        change_payment_status_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+    
 }
 
 namespace lesson

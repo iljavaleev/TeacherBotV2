@@ -6,8 +6,10 @@
 using namespace TgBot;
 using namespace std;
  
+void clear_user_state(long user_id);
+void clear_update_user_state(long user_id);
 
-namespace UserHandlers
+namespace user_handlers
 {   
     class user_start_handler{
         const TgBot::Bot& bot;
@@ -17,34 +19,55 @@ namespace UserHandlers
     };
 }
 
-namespace UserRegisterHandlers
+namespace user_register_handlers
 {   
-    class pupil_rigister_handler{
+    class user_registration_handler
+    {
         const TgBot::Bot& bot;
     public:
-        pupil_rigister_handler(const TgBot::Bot& _bot):bot(_bot){}
+        user_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const Message::Ptr&);
+    };
+
+    class start_register_handler
+    {
+        const TgBot::Bot& bot;
+    public:
+        start_register_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
+    };
+
+   
+    class agree_handler
+    {
+        const TgBot::Bot& bot;
+    public:
+        agree_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
+    };
+
+    class start_user_update_handler{
+        const TgBot::Bot& bot;
+    public:
+        start_user_update_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
 
-    class teacher_rigister_handler{
+     class user_update_state_handler{
         const TgBot::Bot& bot;
     public:
-        teacher_rigister_handler(const TgBot::Bot& _bot):bot(_bot){}
+        user_update_state_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
 
-    class agreement_handler{
+    class get_message_data_for_user_update_handler
+    {
         const TgBot::Bot& bot;
     public:
-        agreement_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
-    };
-
-    class user_update_handler{
-        const TgBot::Bot& bot;
-    public:
-        user_update_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr&);
+        get_message_data_for_user_update_handler(
+            const TgBot::Bot& _bot
+        ):bot(_bot){}
+        Message::Ptr operator()(const Message::Ptr&);
     };
 }
 
