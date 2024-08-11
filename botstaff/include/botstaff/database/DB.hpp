@@ -112,10 +112,7 @@ struct BotUser{
     bot_roles role{};
     bool is_active{false};
 
-    bool empty() const
-    {
-        return !static_cast<bool>(chat_id);
-    }
+    std::string get_full_info(const bot_roles&);
 
     static std::shared_ptr<BotUser> construct(const pqxx::row& res);
 
@@ -341,6 +338,8 @@ void get_users_for_kb(
     const std::string& callback
 );
 
+void get_debts_for_kb(TgBot::InlineKeyboardMarkup::Ptr kb, long chat_id);
+void change_debt_status(long lesson_id);
 // template<typename FT, typename RT, typename PK> 
 // static std::vector<std::shared_ptr<RT>> get_all_related(PK pk)
 // {

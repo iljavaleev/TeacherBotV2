@@ -294,3 +294,219 @@ void UserRegistration::run(const std::string& message)
         std::cerr << e.what() << '\n';
     }       
 }
+
+
+void UpdateUser::send_update_kb()
+{
+    try
+    {
+        bot.getApi().sendMessage(
+            teacher_id, 
+            std::format(
+                "Choose field to update\n{}", 
+                user->get_full_info(user->role)
+            ),
+            nullptr,
+            nullptr,
+            teacherKeyboards::update_user_info_kb(user->role),
+            "HTML"
+        );
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }    
+}
+
+void UpdateUser::send_error_msg(const std::string msg)
+{
+    try
+    {
+        bot.getApi().sendMessage(
+            teacher_id, 
+            msg
+        ); 
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }    
+}
+
+void UpdateUser::change_first_name(const std::string& name)
+{   
+    filter_sender.send(
+        msg::user_registration::check_first_name(
+            name,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::first_name_ok>(
+        [&](const msg::user_registration::first_name_ok& msg)
+    {
+        user->first_name = name;
+        send_update_kb();
+    }).
+    handle<msg::user_registration::first_name_fail>(
+        [&](const msg::user_registration::first_name_fail& msg)
+    {
+       send_error_msg();
+    });
+}
+
+void UpdateUser::change_last_name(const std::string& name)
+{   
+    filter_sender.send(
+        msg::user_registration::check_last_name(
+            name,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::last_name_ok>(
+        [&](const msg::user_registration::last_name_ok& msg)
+    {
+        user->last_name = name;
+        send_update_kb();
+    }).
+    handle<msg::user_registration::last_name_fail>(
+        [&](const msg::user_registration::last_name_fail& msg)
+    {
+       send_error_msg();
+    });
+}
+
+void UpdateUser::change_class(const std::string& cls)
+{
+    filter_sender.send(
+        msg::user_registration::check_class(
+            cls,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::class_ok>(
+        [&](const msg::user_registration::class_ok& msg)
+    {
+        
+        user->cls = cls;
+        send_update_kb();
+    }).
+    handle<msg::user_registration::class_fail>(
+        [&](const msg::user_registration::class_fail& msg)
+    {
+       send_error_msg();
+    });
+};
+
+void UpdateUser::change_phone(const std::string& phone)
+{
+    filter_sender.send(
+        msg::user_registration::check_phone(
+            phone,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::phone_ok>(
+        [&](const msg::user_registration::phone_ok& msg)
+    {
+        user->phone = phone;
+        send_update_kb();
+    }).
+    handle<msg::user_registration::phone_fail>(
+        [&](const msg::user_registration::phone_fail& msg)
+    {
+        send_error_msg();
+    });
+}
+
+void UpdateUser::change_email(const std::string& email)
+{
+    filter_sender.send(
+        msg::user_registration::check_email(
+            email,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::email_ok>(
+        [&](const msg::user_registration::email_ok& msg)
+    {
+        user->email = email;
+        send_update_kb();
+        
+    }).
+    handle<msg::user_registration::email_fail>(
+        [&](const msg::user_registration::email_fail& msg)
+    {
+        send_error_msg();
+    });
+}
+
+void UpdateUser::change_comment(const std::string& comment)
+{
+    user->comment = comment;
+    send_update_kb();  
+}
+
+void UpdateUser::change_active_status(const std::string& status)
+{
+    if(status == "y")
+        user->is_active = true;
+    else if(status == "n")
+        user->is_active = false;
+    else
+    {
+        send_error_msg();
+        return;
+    }
+    send_update_kb();
+}
+
+void UpdateUser::done()
+{
+    get_sender().send(messaging::close_queue());
+}
+
+void UpdateUser::run(const std::string& message) 
+{
+    try
+    {
+        (this->*state)(message);
+    }
+    catch(const messaging::close_queue& )
+    {}
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }       
+}
+
+void UpdateUser::change_state(const std::string& message)
+{
+    if(states.contains(message))
+        state = states.at(message);
+}
+
+typedef void (UpdateUser::*callable)(const std::string&);
+std::unordered_map<std::string, callable> UpdateUser::states = { 
+    {"first_name", &UpdateUser::change_first_name},
+    { "last_name", &UpdateUser::change_last_name},
+    { "class", &UpdateUser::change_class },
+    { "phone",  &UpdateUser::change_phone },
+    { "email", &UpdateUser::change_email },
+    {"comments",  &UpdateUser::change_comment },
+    {"status", &UpdateUser::change_active_status }
+};

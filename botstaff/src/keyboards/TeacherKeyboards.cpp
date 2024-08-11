@@ -22,6 +22,34 @@ namespace teacherKeyboards
         get_comments_for_kb(keyboard, chat_id);
         return keyboard;
     }
+
+    InlineKeyboardMarkup::Ptr create_debts_kb(long chat_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        get_debts_for_kb(keyboard, chat_id);
+        return keyboard;
+    }
+
+    InlineKeyboardMarkup::Ptr change_payment_status(long chat_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        vector<InlineKeyboardButton::Ptr> row;
+
+        InlineKeyboardButton::Ptr change_status_yes_btn(new InlineKeyboardButton);
+        change_status_yes_btn->text = "Yes";
+        change_status_yes_btn->callbackData = 
+            std::format("change_debt yes {}", chat_id);
+        row.push_back(change_status_yes_btn);
+
+        InlineKeyboardButton::Ptr change_status_no_btn(new InlineKeyboardButton);
+        change_status_no_btn->text = "No";
+        change_status_no_btn->callbackData = 
+            std::format("change_debt no {}", chat_id);
+        row.push_back(change_status_no_btn);
+        
+        keyboard->inlineKeyboard.push_back(row);
+        return keyboard;
+    }
     
     InlineKeyboardMarkup::Ptr create_teacher_start_kb(bool is_admin)
     {
@@ -56,6 +84,12 @@ namespace teacherKeyboards
         list_comments_btn->text = "My comments";
         list_comments_btn->callbackData = "comments";
         row.push_back(list_comments_btn);
+
+        InlineKeyboardButton::Ptr list_debts_btn(new InlineKeyboardButton);
+        list_debts_btn->text = "Debt list";
+        list_debts_btn->callbackData = "debts";
+        row.push_back(list_debts_btn);
+    
 
         keyboard->inlineKeyboard.push_back(row);
         return keyboard;
@@ -155,8 +189,7 @@ namespace teacherKeyboards
             InlineKeyboardButton::Ptr update_btn(new InlineKeyboardButton);
             update_btn->text = "Edit";
             update_btn->callbackData = std::format(
-                "update_user {} {}", 
-                (int) u->role, 
+                "update_user {}", 
                 u->chat_id
             );
             row.push_back(update_btn);
@@ -172,8 +205,7 @@ namespace teacherKeyboards
     }
 
     InlineKeyboardMarkup::Ptr update_user_info_kb(
-        const bot_roles& role, 
-        long chat_id
+        const bot_roles& role
     )
     {
         InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
@@ -183,10 +215,8 @@ namespace teacherKeyboards
             new InlineKeyboardButton
         );
         update_first_name_btn->text = "Change name";
-        update_first_name_btn->callbackData = std::format(
-            "update_user_field first_name {}", 
-            chat_id
-        );
+        update_first_name_btn->callbackData = 
+            "update_user_field first_name";
         row.push_back(update_first_name_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
@@ -195,10 +225,8 @@ namespace teacherKeyboards
             new InlineKeyboardButton
         );
         update_last_name_btn->text = "Change surname";
-        update_last_name_btn->callbackData = std::format(
-            "update_user_field last_name {}", 
-            chat_id
-        );
+        update_last_name_btn->callbackData = 
+            "update_user_field last_name";
         row.push_back(update_last_name_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
@@ -209,10 +237,7 @@ namespace teacherKeyboards
                 new InlineKeyboardButton
             );
             update_class_btn->text = "Change class";
-            update_class_btn->callbackData = std::format(
-                "update_user_field class {}", 
-                chat_id
-            );
+            update_class_btn->callbackData = "update_user_field class";
             row.push_back(update_class_btn);
             keyboard->inlineKeyboard.push_back(row);
             row.clear();
@@ -220,40 +245,36 @@ namespace teacherKeyboards
         
         InlineKeyboardButton::Ptr update_phone_btn(new InlineKeyboardButton);
         update_phone_btn->text = "Change phone";
-        update_phone_btn->callbackData = std::format(
-            "update_user_field phone {}", 
-            chat_id
-        );
+        update_phone_btn->callbackData = "update_user_field phone";
+     
         row.push_back(update_phone_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
         InlineKeyboardButton::Ptr update_email_btn(new InlineKeyboardButton);
         update_email_btn->text = "Change mail";
-        update_email_btn->callbackData = std::format(
-            "update_user_field email {}", 
-            chat_id
-        );
+        update_email_btn->callbackData = "update_user_field email";
         row.push_back(update_email_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
         InlineKeyboardButton::Ptr update_comments_btn(new InlineKeyboardButton);
         update_comments_btn->text = "Change comment";
-        update_comments_btn->callbackData = std::format(
-            "update_user_field comments {}", 
-            chat_id
-        );
+        update_comments_btn->callbackData = "update_user_field comments";
         row.push_back(update_comments_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        row.clear();
+
+        InlineKeyboardButton::Ptr update_status_btn(new InlineKeyboardButton);
+        update_status_btn->text = "Change status";
+        update_status_btn->callbackData = "update_user_field status";
+        row.push_back(update_status_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
         InlineKeyboardButton::Ptr finish_update_btn(new InlineKeyboardButton);
         finish_update_btn->text = "Finish editing";
-        finish_update_btn->callbackData = std::format(
-            "update_user_field finish {}", 
-            chat_id
-        );
+        finish_update_btn->callbackData = "update_user_field finish";
         row.push_back(finish_update_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();

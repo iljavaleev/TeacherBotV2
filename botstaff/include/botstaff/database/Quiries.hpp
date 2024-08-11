@@ -18,8 +18,13 @@ namespace other_quiries
     
     inline std::string _get_comments_for_kb = "SELECT l.id, TO_CHAR(l.date, \
     'dd/mm/yyyy'), u.first_name, u.last_name FROM user_lesson as l JOIN \
-    bot_user as u ON l.pupil=u.chat_id WHERE l.teacher={} \
-    ORDER BY date DESC LIMIT 10;";
+    bot_user as u ON l.pupil=u.chat_id WHERE l.teacher={}  AND  \
+    l.comment_for_teacher IS NOT NULL ORDER BY date DESC LIMIT 10;";
+
+    inline std::string _get_debts_for_kb = "SELECT l.id, TO_CHAR(l.date, \
+    'dd/mm/yyyy'), u.first_name, u.last_name FROM user_lesson as l JOIN \
+    bot_user as u ON l.pupil=u.chat_id WHERE l.teacher={}  AND  \
+    l.is_paid=false ORDER BY date;";
 
     inline std::string _create_teachers_list_kb = 
     "SELECT * FROM bot_user WHERE user_role=1 AND is_active={} \
@@ -35,8 +40,12 @@ namespace other_quiries
     inline std::string _create_pupil_for_lesson_kb = "SELECT * FROM bot_user \
     WHERE teacher={} AND is_active=true ORDER BY last_name";
     
-     inline std::string _lesson_info = "SELECT first_name, last_name FROM \
-     bot_user WHERE chat_id={} OR chat_id={};";
+    inline std::string _lesson_info = "SELECT first_name, last_name FROM \
+    bot_user WHERE chat_id={} OR chat_id={};";
+
+    inline std::string _change_debt_status =  "UPDATE user_lesson SET \
+    is_paid = CASE WHEN is_paid=TRUE THEN FALSE ELSE TRUE END WHERE id = {} \
+    RETURNING *;";
 }
 
 #endif

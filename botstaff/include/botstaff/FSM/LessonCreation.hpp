@@ -112,8 +112,6 @@ public:
     {}
     std::shared_ptr<UserLesson> get_instance()
     { 
-        lesson_info->print();
-        lesson_info->lesson->print();
         return lesson_info->lesson; 
     }
     void done();

@@ -6,10 +6,8 @@
 using namespace TgBot;
 using namespace std;
 
-void clear_user_state(long user_id);
-void clear_lesson_state(long user_id);
 
-namespace CommandHandlers
+namespace command_handlers
 {
     class start_command{
         const TgBot::Bot& bot;
@@ -27,7 +25,7 @@ namespace CommandHandlers
    
 };
 
-namespace Handlers
+namespace handlers
 {   
 
     class any_message_handler
@@ -38,31 +36,6 @@ namespace Handlers
         Message::Ptr operator()(const Message::Ptr&);
     };
 
-    class user_registration_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        user_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const Message::Ptr&);
-    };
-
-
-    class start_register_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        start_register_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
-
-   
-    class agree_handler
-    {
-        const TgBot::Bot& bot;
-    public:
-        agree_handler(const TgBot::Bot& _bot):bot(_bot){}
-        Message::Ptr operator()(const CallbackQuery::Ptr& query);
-    };
 
     class calendar_handler
     {
