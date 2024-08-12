@@ -49,7 +49,7 @@ bot_roles get_role(long chat_id)
     }
 
     std::shared_ptr<BotUser> user = BotUser::get(chat_id);
-    if (user == nullptr || !user->is_active)
+    if (!user || !user->is_active || user->role == bot_roles::anon)
         return bot_roles::anon;
  
     roles->insert({chat_id, user->role});

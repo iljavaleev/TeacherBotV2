@@ -37,6 +37,15 @@ namespace user_register_handlers
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
+    class choose_teacher_for_register_handler
+    {
+        const TgBot::Bot& bot;
+    public:
+        choose_teacher_for_register_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr& query);
+    };
+
+
    
     class agree_handler
     {

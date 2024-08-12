@@ -32,7 +32,7 @@ namespace UserKeyboards
         
         InlineKeyboardButton::Ptr register_btn(new InlineKeyboardButton);
         register_btn->text = "Registration";
-        register_btn->callbackData = "register";
+        register_btn->callbackData = "start_register";
         row.push_back(register_btn);
         keyboard->inlineKeyboard.push_back(row);
         
@@ -47,18 +47,18 @@ namespace UserKeyboards
        
         InlineKeyboardButton::Ptr pupil_btn(new InlineKeyboardButton);
         pupil_btn->text = "Student";
-        pupil_btn->callbackData = "register_pupil";
+        pupil_btn->callbackData = "register_as 0";
         row.push_back(pupil_btn);
   
         
         InlineKeyboardButton::Ptr teacher_btn(new InlineKeyboardButton);
         teacher_btn->text = "Teacher";
-        teacher_btn->callbackData = "register_teacher";
+        teacher_btn->callbackData = "register_as 1";
         row.push_back(teacher_btn);
 
         InlineKeyboardButton::Ptr parent_btn(new InlineKeyboardButton);
         parent_btn->text = "Parent";
-        parent_btn->callbackData = "register_parent";
+        parent_btn->callbackData = "register_as 2";
         row.push_back(parent_btn);   
         
         keyboard->inlineKeyboard.push_back(row);

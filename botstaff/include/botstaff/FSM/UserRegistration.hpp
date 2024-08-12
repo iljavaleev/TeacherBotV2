@@ -41,10 +41,9 @@ class UserRegistration
 
     void (UserRegistration::* state)(const std::string&);
 
-
+    void get_class(const std::string& cls);
     void get_first_name(const std::string& name);
     void get_last_name(const std::string& name);
-    void get_class(const std::string& cls);
     void get_phone(const std::string& phone);
     void get_email(const std::string& email);
     void agreement(const std::string& email);
@@ -57,13 +56,18 @@ public:
         const messaging::sender& _fs,
         const TgBot::Bot& _bot, 
         long chat_id, 
-        const std::string& username):
+        const std::string& username,
+        const bot_roles& _role):
             filter_sender(_fs), 
-            bot(_bot)      
+            bot(_bot)
     {    
         user = std::make_shared<BotUser>(chat_id);
         user->tgusername = username;
-        state = &UserRegistration::get_first_name;
+        user->role = _role;
+        if (_role == bot_roles::pupil)
+            state = &UserRegistration::choose_teacher;
+        else if(_role == bot_roles::teacher)
+            state = &UserRegistration::get_first_name;
     }
 
     void done();
@@ -121,4 +125,48 @@ public:
   
 };
 
+
+
+class ParentRegistration
+{
+    messaging::receiver messanger;
+    messaging::sender filter_sender;
+
+    std::shared_ptr<ParentBotUser> user;
+    const Bot& bot;
+    std::string child_email;
+    std::string child_phone;
+
+    void (ParentRegistration::* state)(const std::string&);
+
+    void get_child_email(const std::string& email);
+    void get_child_phone(const std::string& phone);
+
+    void get_first_name(const std::string& name);
+    void get_last_name(const std::string& name);
+    void get_phone(const std::string& phone);
+    void agreement(const std::string& email);
+
+    ParentRegistration(const ParentRegistration&) = delete;
+    ParentRegistration& operator=(const ParentRegistration&) = delete;
+public:
+    
+    ParentRegistration(
+        const messaging::sender& _fs,
+        const TgBot::Bot& _bot, 
+        long chat_id, 
+        const std::string& username
+        ):
+            filter_sender(_fs), 
+            bot(_bot)
+    {    
+        user = std::make_shared<ParentBotUser>(chat_id);
+        user->tgusername = username;
+        state = &ParentRegistration::get_child_email;
+    }
+
+    void done();
+    void run(const std::string& message);
+    messaging::sender get_sender(){ return messanger; }
+};
 #endif

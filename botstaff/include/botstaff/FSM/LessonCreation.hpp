@@ -103,12 +103,12 @@ class UpdateLesson
 public:
     UpdateLesson(
         const messaging::sender& _fs,
-        const TgBot::Bot& _bot,
-        std::shared_ptr<LessonInfo> _lesson
+        std::shared_ptr<LessonInfo> _lesson,
+        const TgBot::Bot& _bot
         ):
             filter_sender(_fs),
-            bot(_bot),
-            lesson_info(_lesson)
+            lesson_info(_lesson),
+            bot(_bot)
     {}
     std::shared_ptr<UserLesson> get_instance()
     { 

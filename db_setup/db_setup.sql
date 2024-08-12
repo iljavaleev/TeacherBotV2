@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS bot_user cascade;
+DROP TABLE IF EXISTS parent_bot_user cascade;
 DROP TABLE IF EXISTS user_lesson;
 
 
@@ -17,6 +18,15 @@ CREATE TABLE bot_user(
     FOREIGN KEY (teacher) REFERENCES bot_user (chat_id) ON DELETE CASCADE 
 );
 
+CREATE TABLE parent_bot_user(
+    chat_id bigint PRIMARY KEY,
+    child bigint,
+    tgusername varchar(128),
+    first_name varchar(255),
+    last_name varchar(255),
+    phone varchar(128) UNIQUE,
+    FOREIGN KEY (child) REFERENCES bot_user (chat_id) ON DELETE CASCADE 
+);
 
 CREATE TABLE user_lesson(
     id SERIAL PRIMARY KEY,

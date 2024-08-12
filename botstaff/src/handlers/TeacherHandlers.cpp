@@ -115,7 +115,6 @@ namespace teacher_handlers
             int lesson_id(std::stoi(
                 StringTools::split(query->data, ' ').at(1))
             );
-            printf("HERE\n");
             std::thread send(
                 send_message_with_kb,
                 std::ref(bot),

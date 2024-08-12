@@ -101,7 +101,7 @@ int main() {
     bot.getEvents().onCallbackQuery(
         teacher_handlers::change_payment_status_handler(bot)
     );
-    
+    // choose_teacher_for_register_handler
         
     signal(SIGINT, [](int s) 
     { 

@@ -86,6 +86,21 @@ std::shared_ptr<UserLesson>  UserLesson::construct(const pqxx::row& res)
     return user_lesson;
 }
 
+std::shared_ptr<ParentBotUser> ParentBotUser::construct(const pqxx::row& res)
+{
+    std::shared_ptr<ParentBotUser> user(new ParentBotUser());
+    if (res.empty())
+        return user;
+    user->chat_id = res.at(0).as<long>();
+    user->child = res.at(1).as<long>();
+    user->tgusername = res.at(2).as<std::string>();
+    user->first_name = res.at(3).as<std::string>();
+    user->last_name = res.at(4).as<std::string>();
+    user->phone = res.at(5).as<std::string>();
+    return user;
+}
+
+
 const std::string BotUser::_get = "SELECT * FROM bot_user WHERE chat_id={};";
 const std::string BotUser::_get_all = "SELECT * FROM bot_user;";
 const std::string BotUser::_create_teacher = "INSERT INTO bot_user VALUES \
@@ -306,6 +321,82 @@ std::string BotUser::get_full_info(const bot_roles& role)
         );
 }
 
+const std::string _get = "SELECT * FROM parent_bot_user WHERE chat_id={}";
+const std::string _get_all = "SELECT * FROM parent_bot_user";
+const std::string _create = "INSERT INTO parent_bot_user VALUES (DEFAULT, {}, \
+'{}', '{}', '{}', '{}') RETURNING *";
+const std::string _update = "UPDATE parent_bot_user SET child={}, \
+tgusername='{}', first_name='{}', last_name='{}', phone='{}', \
+WHERE chat_id={} RETURNING *";
+const std::string _destroy = "DELETE FROM parent_bot_user \
+WHERE id={} RETURNING *;";
+
+std::shared_ptr<ParentBotUser> ParentBotUser::get(int pk)
+{
+    return sql::get<ParentBotUser>(ParentBotUser::_get, pk);
+}
+
+std::vector<std::shared_ptr<ParentBotUser>> ParentBotUser::get_all()
+{
+    return sql::get_all<ParentBotUser>(ParentBotUser::_get_all);
+}
+
+std::vector<std::shared_ptr<ParentBotUser>> BotUser::get_all(
+    const std::string& q
+)
+{
+    return sql::get_all<ParentBotUser>(q);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::destroy(int pk)
+{
+    return sql::destroy<ParentBotUser>(ParentBotUser::_destroy, pk);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::destroy()
+{
+    return sql::destroy<ParentBotUser>(ParentBotUser::_destroy, chat_id);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::update()
+{
+    return sql::create_update<ParentBotUser>(
+        ParentBotUser::_update, 
+        child,
+        tgusername,
+        first_name,
+        last_name,
+        phone,
+        chat_id
+    );
+}
+    
+std::shared_ptr<ParentBotUser> ParentBotUser::create()
+{
+    return sql::create_update<ParentBotUser>(
+        ParentBotUser::_create, 
+        chat_id,
+        child,
+        tgusername,
+        first_name,
+        last_name,
+        phone
+    );
+}
+
+std::string ParentBotUser::get_full_info()
+{   
+    return std::format(
+        "<b><u>{} {}</u></b>\n"
+        "<b><u>Telegram</u></b>: @{}\n"
+        "<b><u>Phone</u></b>: {}\n",
+        first_name,
+        last_name,
+        tgusername,
+        phone
+    );
+}
+
 
 const std::string UserLesson::_get = "SELECT * FROM user_lesson WHERE id={};";
 const std::string UserLesson::_get_all = "SELECT * FROM user_lesson;";
@@ -436,11 +527,12 @@ std::shared_ptr<UserLesson> UserLesson::create()
 
 std::string LessonInfo::get_info_for_teacher()
 {
+    printf("wwww\n");
     return std::format(
-        "<b>Pupil: {}</b>\n"
+        "<b>Student: {}</b>\n"
         "<b>Class start time: {}</b>\n"
         "<b>Objectives</b>: {}\n"
-        "<b>Comments for teacher</b>:\n{}\n",
+        "<b>Comments for teacher</b>:\n{}\n"
         "<b>Payment status</b>: {}", 
         pupil,
         time, 

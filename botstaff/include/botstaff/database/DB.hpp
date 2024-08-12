@@ -167,6 +167,39 @@ struct BotUser{
 };
 
 
+struct ParentBotUser{
+    static const std::string _get;
+    static const std::string _get_all;
+    static const std::string _create;
+    static const std::string _update;
+    static const std::string _destroy;
+    
+    ParentBotUser() = default;
+    ParentBotUser(long chat_id):chat_id(chat_id){}
+    
+    long chat_id{};
+    long child{};
+    std::string tgusername{};
+    std::string first_name{};
+    std::string last_name{};
+    std::string phone{};
+   
+    std::string get_full_info();
+
+    static std::shared_ptr<ParentBotUser> construct(const pqxx::row& res);
+
+    static std::shared_ptr<ParentBotUser> get(int);
+    static std::vector<std::shared_ptr<ParentBotUser>> get_all(
+        const std::string&
+    );
+    static std::vector<std::shared_ptr<ParentBotUser>> get_all();
+    static std::shared_ptr<ParentBotUser> destroy(int);
+    static std::shared_ptr<ParentBotUser> create();
+    std::shared_ptr<ParentBotUser> destroy();
+    std::shared_ptr<ParentBotUser> update();
+
+};
+
 struct UserLesson{
     static const std::string _get;
     static const std::string _get_all;

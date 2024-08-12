@@ -38,7 +38,7 @@ namespace user_handlers
 {
     Message::Ptr user_start_handler::operator()(const CallbackQuery::Ptr& query)
     {
-        if (query->data == "register") 
+        if (query->data == "start_register") 
         {
             std::thread send(
                 send_message_with_kb,
@@ -52,7 +52,6 @@ namespace user_handlers
         }
         return Message::Ptr(nullptr);
     }
-
 }
 
 namespace user_register_handlers
@@ -72,29 +71,78 @@ namespace user_register_handlers
         return Message::Ptr(nullptr);
     }
 
+    Message::Ptr choose_teacher_for_register_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if(user_registration_state.contains(message->chat->id) && 
+            StringTools::startsWith(query->data, "register_pupil"))
+        { 
+            long teacher_id = StringTools::split(query->data, ' ').at(1);
+            
+            std::shared_ptr<UserRegistration> ur = 
+                user_registration_state.at(message->chat->id);
+
+            std::thread t{&UserRegistration::run, ur, teacher_id};
+            t.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
 
     Message::Ptr start_register_handler::operator()(
         const CallbackQuery::Ptr& query
     )
     {
-        if(query->data != "register")
-            return Message::Ptr(nullptr);
-        std::shared_ptr<UserRegistration> ur = 
-        std::make_shared<UserRegistration>(
-            rf.get_sender(),
-            std::ref(bot), 
-            query->message->chat->id, 
-            query->message->chat->username
-        );
-        user_registration_state.emplace(query->message->chat->id, ur);        
-        std::thread send(
-                send_message,
+        if (StringTools::startsWith(query->data, "register_as")) 
+        {
+            
+            InlineKeyboardMarkup::Ptr kb{nullptr};
+            std::string mess;
+
+            bot_roles role = static_cast<bot_roles>(
+                stoi(StringTools::split(query->data, ' ').at(1))
+            );    
+            if (role == bot_roles::parent)
+            {
+                std::shared_ptr<ParentRegistration> pr = 
+                std::make_shared<ParentRegistration>(
+                    rf.get_sender(),
+                    std::ref(bot), 
+                    query->message->chat->id, 
+                    query->message->chat->username,
+                );
+                parent_registration_state.emplace(query->message->chat->id, pr);
+            }
+            else
+            {
+                std::shared_ptr<UserRegistration> ur = 
+                    std::make_shared<UserRegistration>(
+                        rf.get_sender(),
+                        std::ref(bot), 
+                        query->message->chat->id, 
+                        query->message->chat->username,
+                        role
+                    );
+                user_registration_state.emplace(query->message->chat->id, ur);
+
+                if (role == bot_roles::pupil)
+                {
+                    kb = UserKeyboards::create_list_teachers_kb();
+                    mess = "<b>Choose your teacher</b>"; 
+                }
+                mess = "<b>Enter your name</b>";
+            }   
+            std::thread send(
+                send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id,
-                "Enter your name",
+                std::move(mess),
+                kb,
                 "HTML"
             );
-        send.detach();
+            send.detach();
+        }
         return Message::Ptr(nullptr);
     }
 
@@ -103,31 +151,15 @@ namespace user_register_handlers
         const CallbackQuery::Ptr& query
     )
     {
-        auto res = Message::Ptr(nullptr);
-        
-        if(!StringTools::startsWith(query->data, "agreement"))
-            return res;
-
-        if(query->data == "agreement_yes")
+        if(StringTools::startsWith(query->data, "agreement"))
         {
+            std::string answ = StringTools::split(query->data, ' ').at(1);   
             std::shared_ptr<UserRegistration> ur = 
-            user_registration_state.at(query->message->chat->id);
-   
-            std::thread t{&UserRegistration::run, ur, std::ref(query->data)};
-            t.detach();
-       }
-       else
-       {
-            std::thread send(
-                send_message,
-                std::ref(bot),
-                query->message->chat->id,
-                "<b>Registration is not completed<\b>", 
-                "HTML"
-            );
-            send.detach();
-       }     
-        user_registration_state.erase(query->message->chat->id);
+                user_registration_state.at(query->message->chat->id);
+            std::thread t{&UserRegistration::run, ur, answ};
+            t.join();
+            user_registration_state.erase(query->message->chat->id);
+        }
         return Message::Ptr(nullptr); 
     }
 
