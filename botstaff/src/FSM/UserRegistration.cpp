@@ -41,8 +41,8 @@ void UserRegistration::get_class(const std::string& cls)
         try
         {
             bot.getApi().sendMessage(
-            user->chat_id, 
-            "Enter your phone number"
+                user->chat_id, 
+                "Enter your first name"
             );
         }
         catch (std::exception& e)
@@ -87,9 +87,9 @@ void UserRegistration::get_first_name(const std::string& name)
         try
         {
             bot.getApi().sendMessage(
-            user->chat_id, 
-            "Enter your surname"
-        );
+                user->chat_id, 
+                "Enter your last name"
+            );
         }
         catch (std::exception& e)
         {
@@ -133,7 +133,7 @@ void UserRegistration::get_last_name(const std::string& name)
         {
             bot.getApi().sendMessage(
                 user->chat_id, 
-                "Enter your class"
+                "Enter your phone number"
             );
         }
         catch (std::exception& e)
@@ -533,7 +533,6 @@ std::unordered_map<std::string, callable> UpdateUser::states = {
 };
 
 
-
 void ParentRegistration::get_child_email(const std::string& email)
 {
     filter_sender.send(
@@ -548,8 +547,8 @@ void ParentRegistration::get_child_email(const std::string& email)
     handle<msg::user_registration::email_ok>(
         [&](const msg::user_registration::email_ok& msg)
     {
-        state = &ParentRegistration::get_child_phone;
         child_email = email;
+        state = &ParentRegistration::get_child_phone;
         try
         {
             bot.getApi().sendMessage(
@@ -576,26 +575,257 @@ void ParentRegistration::get_child_email(const std::string& email)
         catch (std::exception& e)
         {
             std::cerr << e.what() << std::endl;
+        }
+    });
+
+    
+}
+
+void ParentRegistration::get_child_phone(const std::string& phone)
+{
+    filter_sender.send(
+        msg::user_registration::check_email(
+            phone,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::email_ok>(
+        [&](const msg::user_registration::email_ok& msg)
+    {
+        child_phone = phone;
+    }).
+    handle<msg::user_registration::email_fail>(
+        [&](const msg::user_registration::email_fail& msg)
+    {
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "You entered incorrect information"
+            ); 
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            return;
+        }    
+    });
+
+    filter_sender.send(
+        msg::user_registration::check_pupil_exists(
+            child_phone,
+            child_email,
+            messanger
+        )
+    );
+    
+    messanger.
+    wait().
+    handle<msg::user_registration::pupil_exists_ok>(
+        [&](const msg::user_registration::pupil_exists_ok& msg)
+    {
+        state = &ParentRegistration::get_first_name;
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "Enter your first name"
+            );
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }    
+        
+    }).
+    handle<msg::user_registration::pupil_exists_fail>(
+        [&](msg::user_registration::pupil_exists_fail& msg)
+    {
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "Sorry, there is no student with this " 
+                "phone number and email address. Check the information"
+            ); 
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+        return;    
+    });
+}
+
+void ParentRegistration::get_first_name(const std::string& name)
+{   
+    filter_sender.send(
+        msg::user_registration::check_first_name(
+            name,
+            messanger
+        )
+    );
+
+    messanger.
+    wait().
+    handle<msg::user_registration::first_name_ok>(
+        [&](const msg::user_registration::first_name_ok& msg)
+    {
+        state = &ParentRegistration::get_last_name;
+        user->first_name = name;
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "Enter your last name"
+            );
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }    
+    }).
+    handle<msg::user_registration::first_name_fail>(
+        [&](const msg::user_registration::first_name_fail& msg)
+    {
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "You entered incorrect information"
+            ); 
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
         }    
     });
 }
-void ParentRegistration::get_child_phone(const std::string& phone)
-{
 
-}
-void ParentRegistration::get_first_name(const std::string& name)
-{
-
-}
 void ParentRegistration::get_last_name(const std::string& name)
-{
+{   
+    filter_sender.send(
+        msg::user_registration::check_last_name(
+            name,
+            messanger
+        )
+    );
 
+    messanger.
+    wait().
+    handle<msg::user_registration::last_name_ok>(
+        [&](const msg::user_registration::last_name_ok& msg)
+    {
+        state = &ParentRegistration::get_phone;
+        user->last_name = name;
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "Enter your phone number"
+            );
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }).
+    handle<msg::user_registration::last_name_fail>(
+        [&](const msg::user_registration::last_name_fail& msg)
+    {
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "You entered incorrect information"
+            ); 
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }    
+    });
 }
+
 void ParentRegistration::get_phone(const std::string& phone)
 {
+    filter_sender.send(
+        msg::user_registration::check_phone(
+            phone,
+            messanger
+        )
+    );
 
+    messanger.
+    wait().
+    handle<msg::user_registration::phone_ok>(
+        [&](const msg::user_registration::phone_ok& msg)
+    {
+        state = &ParentRegistration::agreement;
+        user->phone = phone;
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "Enter your email"
+            );
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }    
+        
+    }).
+    handle<msg::user_registration::phone_fail>(
+        [&](const msg::user_registration::phone_fail& msg)
+    {
+        try
+        {
+            bot.getApi().sendMessage(
+                user->chat_id, 
+                "You entered incorrect information"
+            ); 
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }    
+    });
 }
-void ParentRegistration::agreement(const std::string& email)
-{
 
+void ParentRegistration::agreement(const std::string& choice)
+{
+    std::string mess{};
+    long chat_id = user->chat_id;
+    if (choice == "no")
+        mess = "<b>Registration is not completed<\b>";
+    else
+    {   
+        try
+        {
+            user->create();
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
+        mess = "Registration completed successfully";
+    }
+
+    try
+    {
+        bot.getApi().sendMessage(
+            chat_id, 
+            std::move(mess)
+        );
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return;
+    }  
 }

@@ -46,6 +46,9 @@ namespace other_quiries
     inline std::string _change_debt_status =  "UPDATE user_lesson SET \
     is_paid = CASE WHEN is_paid=TRUE THEN FALSE ELSE TRUE END WHERE id = {} \
     RETURNING *;";
+
+    inline std::string _student_exist =  
+        "SELECT * FROM bot_user WHERE phone={} AND email={};";
 }
 
 #endif

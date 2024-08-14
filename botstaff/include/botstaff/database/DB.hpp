@@ -194,7 +194,7 @@ struct ParentBotUser{
     );
     static std::vector<std::shared_ptr<ParentBotUser>> get_all();
     static std::shared_ptr<ParentBotUser> destroy(int);
-    static std::shared_ptr<ParentBotUser> create();
+    std::shared_ptr<ParentBotUser> create();
     std::shared_ptr<ParentBotUser> destroy();
     std::shared_ptr<ParentBotUser> update();
 

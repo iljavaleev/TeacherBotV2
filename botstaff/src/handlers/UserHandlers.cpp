@@ -15,6 +15,8 @@ std::unordered_map<long, std::shared_ptr<UserRegistration>>
     user_registration_state;
 std::unordered_map<long, std::shared_ptr<UpdateUser>> 
     user_update_state;
+std::unordered_map<long, std::shared_ptr<ParentRegistration>> 
+    parent_registration_state;
 extern RegistrationFilter rf;
 
 
@@ -28,9 +30,17 @@ void clear_user_state(long user_id)
 
 void clear_update_user_state(long user_id)
 {
-     if (user_update_state.contains(user_id))
+    if (user_update_state.contains(user_id))
     {
         user_update_state.erase(user_id);
+    }
+}
+
+void clear_parent_registration_state(long user_id)
+{
+     if (parent_registration_state.contains(user_id))
+    {
+        parent_registration_state.erase(user_id);
     }
 }
 
@@ -65,7 +75,7 @@ namespace user_register_handlers
         std::shared_ptr<UserRegistration> ur = 
             user_registration_state.at(message->chat->id);
 
-        std::thread t{&UserRegistration::run, ur, std::ref(message->text)};
+        std::thread t{&UserRegistration::run, ur, message->text};
         t.detach();
         
         return Message::Ptr(nullptr);
@@ -75,13 +85,14 @@ namespace user_register_handlers
         const CallbackQuery::Ptr& query
     )
     {
-        if(user_registration_state.contains(message->chat->id) && 
+        if(user_registration_state.contains(query->message->chat->id) && 
             StringTools::startsWith(query->data, "register_pupil"))
         { 
-            long teacher_id = StringTools::split(query->data, ' ').at(1);
+            std::string teacher_id = 
+                StringTools::split(query->data, ' ').at(1);
             
             std::shared_ptr<UserRegistration> ur = 
-                user_registration_state.at(message->chat->id);
+                user_registration_state.at(query->message->chat->id);
 
             std::thread t{&UserRegistration::run, ur, teacher_id};
             t.detach();
@@ -94,7 +105,8 @@ namespace user_register_handlers
         const CallbackQuery::Ptr& query
     )
     {
-        if (StringTools::startsWith(query->data, "register_as")) 
+        if (StringTools::startsWith(query->data, "register_as") && 
+            !parent_registration_state.contains(query->message->chat->id)) 
         {
             
             InlineKeyboardMarkup::Ptr kb{nullptr};
@@ -110,7 +122,7 @@ namespace user_register_handlers
                     rf.get_sender(),
                     std::ref(bot), 
                     query->message->chat->id, 
-                    query->message->chat->username,
+                    query->message->chat->username
                 );
                 parent_registration_state.emplace(query->message->chat->id, pr);
             }
@@ -131,7 +143,8 @@ namespace user_register_handlers
                     kb = UserKeyboards::create_list_teachers_kb();
                     mess = "<b>Choose your teacher</b>"; 
                 }
-                mess = "<b>Enter your name</b>";
+                else
+                    mess = "<b>Enter your name</b>";
             }   
             std::thread send(
                 send_message_with_kb,
@@ -251,7 +264,7 @@ namespace user_register_handlers
         {
             return Message::Ptr(nullptr);
         }
-            
+           
         std::shared_ptr<UpdateUser> uu = 
             user_update_state.at(message->chat->id);
         std::thread t{&UpdateUser::run, uu, message->text};

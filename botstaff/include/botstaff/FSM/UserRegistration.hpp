@@ -41,6 +41,7 @@ class UserRegistration
 
     void (UserRegistration::* state)(const std::string&);
 
+    void choose_teacher(const std::string& chat_id);
     void get_class(const std::string& cls);
     void get_first_name(const std::string& name);
     void get_last_name(const std::string& name);
@@ -80,10 +81,11 @@ class UpdateUser
 {
     messaging::receiver messanger;
     messaging::sender filter_sender;
+    const TgBot::Bot& bot;
     std::shared_ptr<BotUser> user;
     long teacher_id;
     void (UpdateUser::* state)(const std::string&);
-    const TgBot::Bot& bot;
+    
     
     typedef void (UpdateUser::*callable)(const std::string&);
     static std::unordered_map<std::string, callable> states;
@@ -124,7 +126,6 @@ public:
     messaging::sender get_sender(){ return messanger; }
   
 };
-
 
 
 class ParentRegistration

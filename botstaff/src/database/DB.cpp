@@ -41,7 +41,8 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
-    }   
+    }
+    return R;   
 }   
 
 
@@ -321,14 +322,16 @@ std::string BotUser::get_full_info(const bot_roles& role)
         );
 }
 
-const std::string _get = "SELECT * FROM parent_bot_user WHERE chat_id={}";
-const std::string _get_all = "SELECT * FROM parent_bot_user";
-const std::string _create = "INSERT INTO parent_bot_user VALUES (DEFAULT, {}, \
-'{}', '{}', '{}', '{}') RETURNING *";
-const std::string _update = "UPDATE parent_bot_user SET child={}, \
-tgusername='{}', first_name='{}', last_name='{}', phone='{}', \
-WHERE chat_id={} RETURNING *";
-const std::string _destroy = "DELETE FROM parent_bot_user \
+const std::string ParentBotUser::_get = 
+    "SELECT * FROM parent_bot_user WHERE chat_id={}";
+const std::string ParentBotUser::_get_all = "SELECT * FROM parent_bot_user";
+const std::string ParentBotUser::_create = 
+    "INSERT INTO parent_bot_user VALUES (DEFAULT, {}, \
+    '{}', '{}', '{}', '{}') RETURNING *";
+const std::string ParentBotUser::_update = 
+    "UPDATE parent_bot_user SET child={}, tgusername='{}', first_name='{}', \
+    last_name='{}', phone='{}', WHERE chat_id={} RETURNING *";
+const std::string ParentBotUser::_destroy = "DELETE FROM parent_bot_user \
 WHERE id={} RETURNING *;";
 
 std::shared_ptr<ParentBotUser> ParentBotUser::get(int pk)
@@ -341,7 +344,7 @@ std::vector<std::shared_ptr<ParentBotUser>> ParentBotUser::get_all()
     return sql::get_all<ParentBotUser>(ParentBotUser::_get_all);
 }
 
-std::vector<std::shared_ptr<ParentBotUser>> BotUser::get_all(
+std::vector<std::shared_ptr<ParentBotUser>> ParentBotUser::get_all(
     const std::string& q
 )
 {

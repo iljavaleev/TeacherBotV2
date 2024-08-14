@@ -34,11 +34,25 @@ int RegistrationFilter::count_numbers(const std::string& str)
 bool RegistrationFilter::phone_is_valid(const std::string& phone)
 {
     if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$")))
-    {
+    {   
+        printf("true\n");
         return false;
     }
     return count_numbers(phone) == 11; // for russian tnumbers
 } 
+
+bool RegistrationFilter::user_exist(
+    const std::string& phone, 
+    const std::string& email
+)
+{
+    auto users = BotUser::get_all(
+        create_query(other_quiries::_student_exist, phone, email));
+
+    if (users.empty())
+        return false;
+    return true;
+}
 
 void RegistrationFilter::done()
 { 
@@ -112,7 +126,7 @@ void RegistrationFilter::run()
                 {
                     if(phone_is_valid(msg.content))
                     {
-                        printf("phone is valid\n");
+                        
                         msg.queue.send(
                             msg::user_registration::phone_ok()
                         );
@@ -192,6 +206,25 @@ void RegistrationFilter::run()
                     {
                         msg.queue.send(
                             msg::create_lesson::time_ok()
+                        );
+                    }
+
+                }
+            ).
+            handle<msg::user_registration::check_pupil_exists>(
+                [&](const msg::user_registration::check_pupil_exists& msg)
+                {
+                   
+                    if(user_exist(msg.phone, msg.email))
+                    {
+                        msg.queue.send(
+                            msg::user_registration::pupil_exists_ok()
+                        );
+                    }
+                    else
+                    {
+                        msg.queue.send(
+                             msg::user_registration::pupil_exists_fail()
                         );
                     }
 

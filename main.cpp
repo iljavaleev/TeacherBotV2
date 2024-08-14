@@ -73,7 +73,6 @@ int main() {
     bot.getEvents().onCallbackQuery(teacher_handlers::user_info_handler(bot));
     bot.getEvents().onCallbackQuery(teacher_handlers::comment_text_handler(bot));
     
-    bot.getEvents().onCallbackQuery(user_register_handlers::start_register_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::agree_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::user_update_state_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::start_user_update_handler(bot));
@@ -101,7 +100,10 @@ int main() {
     bot.getEvents().onCallbackQuery(
         teacher_handlers::change_payment_status_handler(bot)
     );
-    // choose_teacher_for_register_handler
+    bot.getEvents().onCallbackQuery(
+        user_register_handlers::choose_teacher_for_register_handler(bot)
+    );
+   
         
     signal(SIGINT, [](int s) 
     { 

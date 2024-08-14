@@ -95,9 +95,7 @@ namespace teacher_handlers
                 std::ref(bot),
                 query->message->chat->id,
                 "List of student debts",
-                teacherKeyboards::create_debts_kb(
-                        query->message->chat->id
-                    ),
+                teacherKeyboards::create_debts_kb(query->message->chat->id),
                 "HTML" 
             );
             send.detach();
