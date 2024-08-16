@@ -13,7 +13,7 @@
 #include <tgbot/tgbot.h>
 #include "Quiries.hpp"
 
-enum class bot_roles;
+enum class bot_roles{ pupil, teacher, parent, admin, anon, pupil_not_active, teacher_not_active };
 
 static const std::string URI = std::format(
     "dbname={} user={} password={} host={} port={}", 
@@ -44,7 +44,10 @@ namespace sql
         std::string q = create_query(query, pk);
         pqxx::result res = sql_transaction(q);
         if(res.empty())
-            return nullptr;
+        {
+            return std::shared_ptr<T>(new T());
+        }
+
         return T::construct(*res.begin());
     }
 
@@ -109,10 +112,14 @@ struct BotUser{
     std::string email{};
     std::string cls{};
     std::string comment{};
-    bot_roles role{};
+    bot_roles role{bot_roles::anon};
     bool is_active{false};
 
-    std::string get_full_info(const bot_roles&);
+    std::string get_full_info();
+    bool empty()
+    {
+        return !chat_id;
+    }
 
     static std::shared_ptr<BotUser> construct(const pqxx::row& res);
 
@@ -167,6 +174,46 @@ struct BotUser{
 };
 
 
+struct ParentBotUser{
+    static const std::string _get;
+    static const std::string _get_all;
+    static const std::string _create;
+    static const std::string _update;
+    static const std::string _destroy;
+    
+    ParentBotUser() = default;
+    ParentBotUser(long chat_id):chat_id(chat_id){}
+    
+    long chat_id{};
+    long child{};
+    std::string tgusername{};
+    std::string first_name{};
+    std::string last_name{};
+    std::string phone{};
+   
+    std::string get_full_info();
+    bool empty()
+    {
+        return !chat_id;
+    }
+
+    static std::string get_debts_message(long parent_id);
+    static std::string get_rescedule_list(long parent_id);
+
+    static std::shared_ptr<ParentBotUser> construct(const pqxx::row& res);
+
+    static std::shared_ptr<ParentBotUser> get(int);
+    static std::vector<std::shared_ptr<ParentBotUser>> get_all(
+        const std::string&
+    );
+    static std::vector<std::shared_ptr<ParentBotUser>> get_all();
+    static std::shared_ptr<ParentBotUser> destroy(int);
+    std::shared_ptr<ParentBotUser> create();
+    std::shared_ptr<ParentBotUser> destroy();
+    std::shared_ptr<ParentBotUser> update();
+
+};
+
 struct UserLesson{
     static const std::string _get;
     static const std::string _get_all;
@@ -185,7 +232,10 @@ struct UserLesson{
     std::string comment_for_teacher{};
     std::string comment_for_parent{};
     bool is_paid{false};
-
+    bool empty()
+    {
+        return !id;
+    }
 
     static std::shared_ptr<UserLesson> construct(const pqxx::row& res);
     static std::shared_ptr<UserLesson> get(int);
@@ -340,6 +390,12 @@ void get_users_for_kb(
 
 void get_debts_for_kb(TgBot::InlineKeyboardMarkup::Ptr kb, long chat_id);
 void change_debt_status(long lesson_id);
+
+
+bot_roles get_role(long chat_id);
+bool is_admin(long chat_id);
+bool is_teacher(long chat_id);
+std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id);
 // template<typename FT, typename RT, typename PK> 
 // static std::vector<std::shared_ptr<RT>> get_all_related(PK pk)
 // {

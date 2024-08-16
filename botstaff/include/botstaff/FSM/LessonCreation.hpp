@@ -80,9 +80,10 @@ class UpdateLesson
 {
     messaging::receiver messanger;
     messaging::sender filter_sender;
+    const TgBot::Bot& bot;
     std::shared_ptr<LessonInfo> lesson_info;
     void (UpdateLesson::* state)(const std::string&);
-    const TgBot::Bot& bot;
+    
     
     typedef void (UpdateLesson::*callable)(const std::string&);
     static std::unordered_map<std::string, callable> states;

@@ -34,41 +34,6 @@ std::string chrono_to_string_date(const std::chrono::year_month_day& ymd)
 }
 
 
-bot_roles get_role(long chat_id)
-{
-    if (roles->size() > 100)
-        roles->clear();
-    
-    if (roles->contains(chat_id))
-        return roles->at(chat_id);
-
-    if (is_admin(chat_id))
-    {
-        roles->insert({chat_id, bot_roles::admin});
-        return bot_roles::admin;
-    }
-
-    std::shared_ptr<BotUser> user = BotUser::get(chat_id);
-    if (user == nullptr || !user->is_active)
-        return bot_roles::anon;
- 
-    roles->insert({chat_id, user->role});
-    return user->role;
-}
-
-bool is_admin(long chat_id)
-{   
-    std::string s_chat_id(std::getenv("ADMIN_CHAT_ID"));
-
-    return std::stol(s_chat_id) == chat_id;
-}
-
-bool is_teacher(long chat_id)
-{
-    bot_roles role = get_role(chat_id);
-    return (role ==bot_roles::admin) || (role == bot_roles::teacher);
-}
-
 void send_message_with_kb(
     const TgBot::Bot& bot, 
     long chat_id, 
@@ -150,5 +115,3 @@ std::string get_pupil_info(const std::shared_ptr<BotUser>& u)
         u->comment
     );
 }
-
-

@@ -32,8 +32,38 @@ namespace UserKeyboards
         
         InlineKeyboardButton::Ptr register_btn(new InlineKeyboardButton);
         register_btn->text = "Registration";
-        register_btn->callbackData = "register";
+        register_btn->callbackData = "start_register";
         row.push_back(register_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        
+        return keyboard;
+    }
+
+    InlineKeyboardMarkup::Ptr create_parent_start_kb(long chat_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        vector<InlineKeyboardButton::Ptr> row;
+
+        InlineKeyboardButton::Ptr reschedule_class_btn(
+            new InlineKeyboardButton
+        );
+        reschedule_class_btn->text = "List of class rescheduling";
+        reschedule_class_btn->callbackData = "parent_reschedule";
+        row.push_back(reschedule_class_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        row.clear();
+
+        InlineKeyboardButton::Ptr comments_btn(new InlineKeyboardButton);
+        comments_btn->text = "List of teacher comments";
+        comments_btn->callbackData = "parent_comments";
+        row.push_back(comments_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        row.clear();
+
+        InlineKeyboardButton::Ptr debt_btn(new InlineKeyboardButton);
+        debt_btn->text = "Student debts";
+        debt_btn->callbackData = "parent_debts";
+        row.push_back(debt_btn);
         keyboard->inlineKeyboard.push_back(row);
         
         return keyboard;
@@ -44,21 +74,19 @@ namespace UserKeyboards
         InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
         vector<InlineKeyboardButton::Ptr> row;
 
-       
         InlineKeyboardButton::Ptr pupil_btn(new InlineKeyboardButton);
         pupil_btn->text = "Student";
-        pupil_btn->callbackData = "register_pupil";
+        pupil_btn->callbackData = "register_as 0";
         row.push_back(pupil_btn);
   
-        
         InlineKeyboardButton::Ptr teacher_btn(new InlineKeyboardButton);
         teacher_btn->text = "Teacher";
-        teacher_btn->callbackData = "register_teacher";
+        teacher_btn->callbackData = "register_as 1";
         row.push_back(teacher_btn);
 
         InlineKeyboardButton::Ptr parent_btn(new InlineKeyboardButton);
         parent_btn->text = "Parent";
-        parent_btn->callbackData = "register_parent";
+        parent_btn->callbackData = "register_as 2";
         row.push_back(parent_btn);   
         
         keyboard->inlineKeyboard.push_back(row);
@@ -90,6 +118,32 @@ namespace UserKeyboards
             keyboard->inlineKeyboard.push_back(row);
         }
 
+        return keyboard;
+    }
+
+    InlineKeyboardMarkup::Ptr parent_comments(long chat_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        std::vector<std::shared_ptr<UserLesson>> comments = 
+            get_parent_comments(chat_id);
+        vector<InlineKeyboardButton::Ptr> row;
+        
+        for (const auto& comment: comments)
+        {
+            InlineKeyboardButton::Ptr btn(new InlineKeyboardButton);
+            std::chrono::year_month_day ymd = 
+                string_to_chrono_date(comment->date);
+            
+            btn->text = std::format(
+                "{} {} {}", ymd.day(), ymd.month(), ymd.year());
+            btn->callbackData = std::format(
+                "for_parent_comment {}", 
+                comment->comment_for_parent
+            );
+            row.push_back(btn);
+            keyboard->inlineKeyboard.push_back(row);
+            row.clear();
+        }
         return keyboard;
     }
 }

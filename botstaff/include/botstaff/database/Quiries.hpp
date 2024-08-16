@@ -46,6 +46,25 @@ namespace other_quiries
     inline std::string _change_debt_status =  "UPDATE user_lesson SET \
     is_paid = CASE WHEN is_paid=TRUE THEN FALSE ELSE TRUE END WHERE id = {} \
     RETURNING *;";
-}
+
+    inline std::string _student_exist =  
+        "SELECT * FROM bot_user WHERE phone='{}' AND email='{}';";
+
+    inline std::string _get_debts = 
+        "SELECT lesson.date FROM user_lesson as lesson \
+        JOIN parent_bot_user as u ON u.child=lesson.pupil \
+        WHERE lesson.is_paid=FALSE AND u.chat_id={} ORDER BY \
+        lesson.date DESC";
+    
+    inline std::string _get_rescedule = 
+        "SELECT date, comment FROM rescedule_table WHERE \
+        chat_id=(SELECT child FROM parent_bot_user WHERE chat_id={}) \
+        ORDER BY date DESC LIMIT 5";
+    
+    inline std::string _get_parent_comments = 
+        "SELECT * FROM user_lesson WHERE \
+        pupil=(SELECT child FROM parent_bot_user WHERE chat_id={}) \
+        ORDER BY date DESC LIMIT 5";
+}   
 
 #endif

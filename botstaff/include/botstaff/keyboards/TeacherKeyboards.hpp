@@ -14,6 +14,8 @@ namespace teacherKeyboards
     InlineKeyboardMarkup::Ptr create_teacher_start_kb(bool);
     InlineKeyboardMarkup::Ptr create_teachers_kb();
     InlineKeyboardMarkup::Ptr create_pupils_kb(long);
+    
+    
     InlineKeyboardMarkup::Ptr create_comments_kb(long);
     InlineKeyboardMarkup::Ptr create_debts_kb(long);
     InlineKeyboardMarkup::Ptr change_payment_status(long);

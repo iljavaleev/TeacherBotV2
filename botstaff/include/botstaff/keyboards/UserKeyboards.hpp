@@ -16,6 +16,8 @@ namespace UserKeyboards
     );
     InlineKeyboardMarkup::Ptr choose_role_kb();
     InlineKeyboardMarkup::Ptr create_list_teachers_kb();
+    InlineKeyboardMarkup::Ptr create_parent_start_kb(long);
+    InlineKeyboardMarkup::Ptr parent_comments(long);
 }
 
 #endif

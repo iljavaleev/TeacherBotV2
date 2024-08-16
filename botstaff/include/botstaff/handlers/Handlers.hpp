@@ -27,7 +27,6 @@ namespace command_handlers
 
 namespace handlers
 {   
-
     class any_message_handler
     {
         const TgBot::Bot& bot;
@@ -35,7 +34,6 @@ namespace handlers
         any_message_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
-
 
     class calendar_handler
     {
@@ -52,7 +50,6 @@ namespace handlers
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
     
-
     class calendar_day_handler{
         const TgBot::Bot& bot;
     public:

@@ -212,12 +212,12 @@ namespace Keyboards
 
         InlineKeyboardButton::Ptr yes_btn(new InlineKeyboardButton);
         yes_btn->text = "Yes";
-        yes_btn->callbackData = "agreement_yes";
+        yes_btn->callbackData = "agreement yes";
         row.push_back(yes_btn);
 
         InlineKeyboardButton::Ptr no_btn(new InlineKeyboardButton);
         no_btn->text = "No";
-        no_btn->callbackData = "agreement_no";
+        no_btn->callbackData = "agreement no";
         row.push_back(no_btn);
 
         keyboard->inlineKeyboard.push_back(row);

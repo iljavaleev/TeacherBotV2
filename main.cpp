@@ -49,10 +49,17 @@ int main() {
     bot.getApi().setMyCommands(commands);
     bot.getEvents().onCommand("start", command_handlers::start_command(bot));
     bot.getEvents().onCommand("cancel", command_handlers::cancel_command(bot));
-    
+    bot.getEvents().onCallbackQuery(user_handlers::user_start_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::start_register_handler(bot));
     bot.getEvents().onNonCommandMessage(user_register_handlers::user_registration_handler(bot));
-    
+    bot.getEvents().onNonCommandMessage(user_register_handlers::parent_registration_handler(bot));
+    bot.getEvents().onCallbackQuery(user_register_handlers::agree_handler(bot));
+    bot.getEvents().onCallbackQuery(user_register_handlers::user_update_state_handler(bot));
+    bot.getEvents().onCallbackQuery(user_register_handlers::start_user_update_handler(bot));
+    bot.getEvents().onCallbackQuery(
+        user_register_handlers::choose_teacher_for_register_handler(bot)
+    );
+
     bot.getEvents().onCallbackQuery(lesson::start_lesson_creation_handler(bot));
     bot.getEvents().onNonCommandMessage(lesson::lesson_creation_handler(bot));
     bot.getEvents().onNonCommandMessage(
@@ -69,15 +76,8 @@ int main() {
     bot.getEvents().onCallbackQuery(teacher_handlers::activate_user(bot));
     bot.getEvents().onCallbackQuery(teacher_handlers::delete_user(bot));
      
-    bot.getEvents().onCallbackQuery(user_handlers::user_start_handler(bot));
     bot.getEvents().onCallbackQuery(teacher_handlers::user_info_handler(bot));
     bot.getEvents().onCallbackQuery(teacher_handlers::comment_text_handler(bot));
-    
-    bot.getEvents().onCallbackQuery(user_register_handlers::start_register_handler(bot));
-    bot.getEvents().onCallbackQuery(user_register_handlers::agree_handler(bot));
-    bot.getEvents().onCallbackQuery(user_register_handlers::user_update_state_handler(bot));
-    bot.getEvents().onCallbackQuery(user_register_handlers::start_user_update_handler(bot));
-    
     
     bot.getEvents().onCallbackQuery(handlers::calendar_handler(bot));
     bot.getEvents().onCallbackQuery(handlers::next_month_handler(bot));
@@ -101,8 +101,22 @@ int main() {
     bot.getEvents().onCallbackQuery(
         teacher_handlers::change_payment_status_handler(bot)
     );
-    
-        
+    bot.getEvents().onCallbackQuery(
+        user_handlers::list_of_student_debts_handler(bot)
+    );
+
+    bot.getEvents().onCallbackQuery(
+        user_handlers::list_of_student_rescheduling_handler(bot)
+    );
+
+     bot.getEvents().onCallbackQuery(
+        user_handlers::list_of_for_parent_comments_handler(bot)
+    );
+     bot.getEvents().onCallbackQuery(
+        user_handlers::content_of_for_parent_comment_handler(bot)
+    );
+   
+           
     signal(SIGINT, [](int s) 
     { 
         printf("SIGINT got\n"); 

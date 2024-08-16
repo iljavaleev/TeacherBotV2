@@ -76,6 +76,20 @@ namespace msg
             check_message(agr, _queue){}
         };
 
+        struct check_pupil_exists
+        {
+            std::string phone;
+            std::string email;
+            mutable messaging::sender queue;
+            check_pupil_exists(
+                const std::string& _phone,
+                const std::string& _email,
+                messaging::sender _queue
+            ):
+            phone(_phone), email(_email), queue(_queue){}
+        };
+
+
         ///////////////////////////////////////////////////////////////////
         struct first_name_ok
         {};
@@ -107,6 +121,14 @@ namespace msg
         {
         };
         struct email_fail
+        {
+        };
+        struct pupil_exists_ok
+        {   
+            long child_id;
+            pupil_exists_ok(long _child_id):child_id(_child_id){}
+        };
+        struct pupil_exists_fail
         {
         };
     };

@@ -1,6 +1,7 @@
 #include "botstaff/database/DB.hpp"
 #include "botstaff/database/Quiries.hpp"
 #include <stdexcept>
+#include <sstream>
 
 static std::mutex bdmtx;
 using namespace TgBot;
@@ -41,15 +42,14 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
-    }   
+    }
+    return R;   
 }   
 
 
 std::shared_ptr<BotUser> BotUser::construct(const pqxx::row& res)
 {
-    std::shared_ptr<BotUser> user(new BotUser());
-    if (res.empty())
-        return user;
+    std::shared_ptr<BotUser> user = std::make_shared<BotUser>();
     if (res.at(9).as<int>() == 0)
     {
         user->teacher = res.at(1).as<long>();
@@ -70,9 +70,7 @@ std::shared_ptr<BotUser> BotUser::construct(const pqxx::row& res)
 
 std::shared_ptr<UserLesson>  UserLesson::construct(const pqxx::row& res)
 {
-    std::shared_ptr<UserLesson> user_lesson(new UserLesson());
-    if (res.empty())
-        return user_lesson;
+    std::shared_ptr<UserLesson> user_lesson = std::make_shared<UserLesson>();
     user_lesson->id = res.at(0).as<int>();
     user_lesson->date = res.at(1).as<std::string>();
     user_lesson->time = res.at(2).as<std::string>();
@@ -85,6 +83,19 @@ std::shared_ptr<UserLesson>  UserLesson::construct(const pqxx::row& res)
     user_lesson->is_paid = res.at(9).as<bool>();
     return user_lesson;
 }
+
+std::shared_ptr<ParentBotUser> ParentBotUser::construct(const pqxx::row& res)
+{
+    std::shared_ptr<ParentBotUser> user = std::make_shared<ParentBotUser>();
+    user->chat_id = res.at(0).as<long>();
+    user->child = res.at(1).as<long>();
+    user->tgusername = res.at(2).as<std::string>();
+    user->first_name = res.at(3).as<std::string>();
+    user->last_name = res.at(4).as<std::string>();
+    user->phone = res.at(5).as<std::string>();
+    return user;
+}
+
 
 const std::string BotUser::_get = "SELECT * FROM bot_user WHERE chat_id={};";
 const std::string BotUser::_get_all = "SELECT * FROM bot_user;";
@@ -273,7 +284,7 @@ std::shared_ptr<BotUser> BotUser::create_pupil()
     );
 }
 
-std::string BotUser::get_full_info(const bot_roles& role)
+std::string BotUser::get_full_info()
 {   
     if (role == bot_roles::pupil)
         return std::format(
@@ -304,6 +315,127 @@ std::string BotUser::get_full_info(const bot_roles& role)
             is_active ? "active" : "not active",
             comment
         );
+}
+
+const std::string ParentBotUser::_get = 
+    "SELECT * FROM parent_bot_user WHERE chat_id={}";
+const std::string ParentBotUser::_get_all = "SELECT * FROM parent_bot_user";
+const std::string ParentBotUser::_create = 
+    "INSERT INTO parent_bot_user VALUES ({}, {}, \
+    '{}', '{}', '{}', '{}') RETURNING *";
+const std::string ParentBotUser::_update = 
+    "UPDATE parent_bot_user SET child={}, tgusername='{}', first_name='{}', \
+    last_name='{}', phone='{}', WHERE chat_id={} RETURNING *";
+const std::string ParentBotUser::_destroy = 
+    "DELETE FROM parent_bot_user WHERE id={} RETURNING *;";
+
+
+std::string ParentBotUser::get_debts_message(long parent_id)
+{
+    auto res = sql_transaction(create_query(
+        other_quiries::_get_debts, 
+        parent_id));
+    std::stringstream ss;
+    ss << "<b><u>Your debts:</u></b>\n";
+    int count{1};
+    for (auto it(res.begin()); it != res.end(); ++it, ++count)
+    {   
+        std::chrono::year_month_day ymd = 
+            string_to_chrono_date(it->at(0).as<std::string>());
+        ss << std::format(
+            "{}. {} {} {}\n", count, ymd.day(), ymd.month(), ymd.year()
+        );
+    }
+    return ss.str();
+}
+
+std::string ParentBotUser::get_rescedule_list(long parent_id)
+{
+    auto res = sql_transaction(create_query(
+        other_quiries::_get_rescedule, 
+        parent_id));
+    std::stringstream ss;
+    ss << "<b><u>Latest reschedules:</u></b>\n";
+    int count{1};
+    for (auto it(res.begin()); it != res.end(); ++it, ++count)
+    {   
+        
+        std::chrono::year_month_day ymd = 
+            string_to_chrono_date(it->at(0).as<std::string>());
+        ss << std::format(
+            "{}. {} {} {}\n", count, ymd.day(), ymd.month(), ymd.year()
+        );
+        ss << "Comment: ";
+        ss << it->at(1).as<std::string>();
+        ss << '\n';
+    }
+    return ss.str();
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::get(int pk)
+{
+    return sql::get<ParentBotUser>(ParentBotUser::_get, pk);
+}
+
+std::vector<std::shared_ptr<ParentBotUser>> ParentBotUser::get_all()
+{
+    return sql::get_all<ParentBotUser>(ParentBotUser::_get_all);
+}
+
+std::vector<std::shared_ptr<ParentBotUser>> ParentBotUser::get_all(
+    const std::string& q
+)
+{
+    return sql::get_all<ParentBotUser>(q);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::destroy(int pk)
+{
+    return sql::destroy<ParentBotUser>(ParentBotUser::_destroy, pk);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::destroy()
+{
+    return sql::destroy<ParentBotUser>(ParentBotUser::_destroy, chat_id);
+}
+
+std::shared_ptr<ParentBotUser> ParentBotUser::update()
+{
+    return sql::create_update<ParentBotUser>(
+        ParentBotUser::_update, 
+        child,
+        tgusername,
+        first_name,
+        last_name,
+        phone,
+        chat_id
+    );
+}
+    
+std::shared_ptr<ParentBotUser> ParentBotUser::create()
+{
+    return sql::create_update<ParentBotUser>(
+        ParentBotUser::_create, 
+        chat_id,
+        child,
+        tgusername,
+        first_name,
+        last_name,
+        phone
+    );
+}
+
+std::string ParentBotUser::get_full_info()
+{   
+    return std::format(
+        "<b><u>{} {}</u></b>\n"
+        "<b><u>Telegram</u></b>: @{}\n"
+        "<b><u>Phone</u></b>: {}\n",
+        first_name,
+        last_name,
+        tgusername,
+        phone
+    );
 }
 
 
@@ -436,11 +568,12 @@ std::shared_ptr<UserLesson> UserLesson::create()
 
 std::string LessonInfo::get_info_for_teacher()
 {
+    printf("wwww\n");
     return std::format(
-        "<b>Pupil: {}</b>\n"
+        "<b>Student: {}</b>\n"
         "<b>Class start time: {}</b>\n"
         "<b>Objectives</b>: {}\n"
-        "<b>Comments for teacher</b>:\n{}\n",
+        "<b>Comments for teacher</b>:\n{}\n"
         "<b>Payment status</b>: {}", 
         pupil,
         time, 
@@ -784,3 +917,59 @@ void change_debt_status(long lesson_id)
         throw std::runtime_error(e.what());
     }
 }   
+
+bot_roles get_role(long chat_id)
+{
+    if (roles->size() > 100)
+        roles->clear();
+    
+    if (roles->contains(chat_id))
+        return roles->at(chat_id);
+    
+    if (is_admin(chat_id))
+    {
+        roles->insert({chat_id, bot_roles::admin});
+        return bot_roles::admin;
+    }
+    std::shared_ptr<ParentBotUser> p = ParentBotUser::get(chat_id);
+    if (!p->empty())
+    {
+        roles->insert({chat_id, bot_roles::parent});
+        return bot_roles::parent;
+    }
+        
+    std::shared_ptr<BotUser> user = BotUser::get(chat_id);
+    if (user->role == bot_roles::anon)
+    {   
+        return user->role;
+    }
+
+    if (!user->is_active && user->role == bot_roles::teacher)
+        return bot_roles::teacher_not_active;
+    if (!user->is_active && user->role == bot_roles::pupil)
+        return bot_roles::pupil_not_active;
+    
+    roles->insert({chat_id, user->role});
+    return user->role;
+}
+
+bool is_admin(long chat_id)
+{   
+    std::string s_chat_id(std::getenv("ADMIN_CHAT_ID"));
+
+    return std::stol(s_chat_id) == chat_id;
+}
+
+bool is_teacher(long chat_id)
+{
+    bot_roles role = get_role(chat_id);
+    return (role ==bot_roles::admin) || (role == bot_roles::teacher);
+}
+
+std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id)
+{
+    std::string query = 
+        create_query(other_quiries::_get_parent_comments, chat_id);
+
+    return UserLesson::get_all(query);
+}
