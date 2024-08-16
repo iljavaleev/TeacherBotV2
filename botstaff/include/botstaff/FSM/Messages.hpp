@@ -124,7 +124,9 @@ namespace msg
         {
         };
         struct pupil_exists_ok
-        {
+        {   
+            long child_id;
+            pupil_exists_ok(long _child_id):child_id(_child_id){}
         };
         struct pupil_exists_fail
         {

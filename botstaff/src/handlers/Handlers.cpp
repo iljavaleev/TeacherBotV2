@@ -32,13 +32,14 @@ namespace command_handlers
     {
         long chat_id(message->chat->id);
         clear_user_state(chat_id);
+        clear_update_user_state(chat_id);
         clear_lesson_state(chat_id);
         clear_lesson_update_state(chat_id);
-        clear_lesson_update_state(chat_id);
+        clear_parent_registration_state(chat_id);
         bot_roles role = get_role(chat_id);
         
-        std::string mes;
-        InlineKeyboardMarkup::Ptr kb;
+        std::string mes{};
+        InlineKeyboardMarkup::Ptr kb(nullptr);
         if (role == bot_roles::admin)
         {
             mes = "Admin menu";
@@ -49,11 +50,23 @@ namespace command_handlers
             mes = "Teacher menu";
             kb = teacherKeyboards::create_teacher_start_kb(false);
         }
-
         else if(role == bot_roles::pupil)
         {
             mes = "Pupil menu";
             kb = UserKeyboards::create_user_start_kb(chat_id);
+        }
+        else if(role == bot_roles::parent)
+        {
+            mes = "Parent menu";
+            kb = UserKeyboards::create_parent_start_kb(chat_id);
+        }
+        else if(role == bot_roles::teacher_not_active)
+        {
+            mes = "Please wait for administrator to activate your account";
+        }
+        else if(role == bot_roles::pupil_not_active)
+        {
+            mes ="Please wait for your teacher to activate your account";
         }
         else
         {
@@ -77,9 +90,10 @@ namespace command_handlers
     {
         long chat_id(message->chat->id);
         clear_user_state(chat_id);
+        clear_update_user_state(chat_id);
         clear_lesson_state(chat_id);
         clear_lesson_update_state(chat_id);
-        clear_lesson_update_state(chat_id);
+        clear_parent_registration_state(chat_id);
         std::thread send(
             send_message,
             std::ref(bot), 

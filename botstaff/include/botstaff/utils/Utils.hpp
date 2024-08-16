@@ -12,7 +12,7 @@
 
 #include "botstaff/database/DB.hpp"
 
-enum class bot_roles{ pupil, teacher, parent, admin, anon };
+enum class bot_roles;
 struct BotUser;
 
 inline std::shared_ptr<std::unordered_map<long, bot_roles>> roles(
@@ -36,9 +36,7 @@ std::chrono::year_month_day string_to_chrono_date(
 );
 std::string chrono_to_string_date(const std::chrono::year_month_day& ymd);
 
-bot_roles get_role(long chat_id);
-bool is_admin(long chat_id);
-bool is_teacher(long chat_id);
+
 
 void send_message_with_kb(
     const TgBot::Bot& bot, 

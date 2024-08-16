@@ -2,6 +2,7 @@
 
 using namespace TgBot;
 
+
 void UserRegistration::choose_teacher(const std::string& chat_id)
 {
     user->teacher = std::stol(chat_id);
@@ -325,7 +326,7 @@ void UpdateUser::send_update_kb()
             teacher_id, 
             std::format(
                 "Choose field to update\n{}", 
-                user->get_full_info(user->role)
+                user->get_full_info()
             ),
             nullptr,
             nullptr,
@@ -584,7 +585,7 @@ void ParentRegistration::get_child_email(const std::string& email)
 void ParentRegistration::get_child_phone(const std::string& phone)
 {
     filter_sender.send(
-        msg::user_registration::check_email(
+        msg::user_registration::check_phone(
             phone,
             messanger
         )
@@ -592,25 +593,25 @@ void ParentRegistration::get_child_phone(const std::string& phone)
 
     messanger.
     wait().
-    handle<msg::user_registration::email_ok>(
-        [&](const msg::user_registration::email_ok& msg)
+    handle<msg::user_registration::phone_ok>(
+        [&](const msg::user_registration::phone_ok& msg)
     {
         child_phone = phone;
     }).
-    handle<msg::user_registration::email_fail>(
-        [&](const msg::user_registration::email_fail& msg)
+    handle<msg::user_registration::phone_fail>(
+        [&](const msg::user_registration::phone_fail& msg)
     {
         try
         {
             bot.getApi().sendMessage(
                 user->chat_id, 
                 "You entered incorrect information"
-            ); 
+            );
+            return; 
         }
         catch (std::exception& e)
         {
             std::cerr << e.what() << std::endl;
-            return;
         }    
     });
 
@@ -628,6 +629,7 @@ void ParentRegistration::get_child_phone(const std::string& phone)
         [&](const msg::user_registration::pupil_exists_ok& msg)
     {
         state = &ParentRegistration::get_first_name;
+        user->child = msg.child_id;
         try
         {
             bot.getApi().sendMessage(
@@ -770,7 +772,10 @@ void ParentRegistration::get_phone(const std::string& phone)
         {
             bot.getApi().sendMessage(
                 user->chat_id, 
-                "Enter your email"
+                "You consent to the processing of personal data?",
+                nullptr, 
+                nullptr, 
+                Keyboards::agreement_kb()
             );
         }
         catch (std::exception& e)
@@ -806,6 +811,7 @@ void ParentRegistration::agreement(const std::string& choice)
     {   
         try
         {
+            std::cout << user->get_full_info() << std::endl;
             user->create();
         }
         catch(const std::exception& e)
@@ -828,4 +834,23 @@ void ParentRegistration::agreement(const std::string& choice)
         std::cerr << e.what() << std::endl;
         return;
     }  
+}
+
+void ParentRegistration::done()
+{
+    get_sender().send(messaging::close_queue());
+}
+
+void ParentRegistration::run(const std::string& message) 
+{
+    try
+    {
+        (this->*state)(message);
+    }
+    catch(const messaging::close_queue& )
+    {}
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }       
 }

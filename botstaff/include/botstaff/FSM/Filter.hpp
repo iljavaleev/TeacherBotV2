@@ -14,7 +14,8 @@ class RegistrationFilter
     bool name_is_ok(std::string name);
     int count_numbers(const std::string& str);
     bool phone_is_valid(const std::string& phone);
-    bool user_exist(const std::string& phone, const std::string& email);
+    std::shared_ptr<BotUser> user_exist(
+        const std::string& phone, const std::string& email);
     
 public:
 

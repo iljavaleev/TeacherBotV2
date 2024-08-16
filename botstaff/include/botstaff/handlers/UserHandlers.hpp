@@ -8,6 +8,7 @@ using namespace std;
  
 void clear_user_state(long user_id);
 void clear_update_user_state(long user_id);
+void clear_parent_registration_state(long user_id);
 
 namespace user_handlers
 {   
@@ -15,6 +16,34 @@ namespace user_handlers
         const TgBot::Bot& bot;
     public:
         user_start_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+    class list_of_student_debts_handler{
+        const TgBot::Bot& bot;
+    public:
+        list_of_student_debts_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+     class list_of_student_rescheduling_handler{
+        const TgBot::Bot& bot;
+    public:
+        list_of_student_rescheduling_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+     class list_of_for_parent_comments_handler{
+        const TgBot::Bot& bot;
+    public:
+        list_of_for_parent_comments_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+    class content_of_for_parent_comment_handler{
+        const TgBot::Bot& bot;
+    public:
+        content_of_for_parent_comment_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
 }
@@ -26,6 +55,14 @@ namespace user_register_handlers
         const TgBot::Bot& bot;
     public:
         user_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const Message::Ptr&);
+    };
+
+    class parent_registration_handler
+    {
+        const TgBot::Bot& bot;
+    public:
+        parent_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
 
@@ -45,8 +82,6 @@ namespace user_register_handlers
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-
-   
     class agree_handler
     {
         const TgBot::Bot& bot;
@@ -78,6 +113,7 @@ namespace user_register_handlers
         ):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
+    
 }
 
 #endif

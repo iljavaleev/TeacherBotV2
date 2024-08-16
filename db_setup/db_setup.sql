@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS bot_user cascade;
 DROP TABLE IF EXISTS parent_bot_user cascade;
 DROP TABLE IF EXISTS user_lesson;
+DROP TABLE IF EXISTS rescedule_table;
 
 
 CREATE TABLE bot_user(
@@ -28,9 +29,17 @@ CREATE TABLE parent_bot_user(
     FOREIGN KEY (child) REFERENCES bot_user (chat_id) ON DELETE CASCADE 
 );
 
+CREATE TABLE rescedule_table(
+    id SERIAL PRIMARY KEY,
+    chat_id bigint,
+    date date UNIQUE,
+    comment text,
+    FOREIGN KEY (chat_id) REFERENCES bot_user (chat_id) ON DELETE CASCADE 
+);
+
 CREATE TABLE user_lesson(
     id SERIAL PRIMARY KEY,
-    date date,
+    date date UNIQUE,
     time varchar(32) NOT NULL,
     teacher bigint,
     pupil bigint,

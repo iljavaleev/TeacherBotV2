@@ -41,17 +41,16 @@ bool RegistrationFilter::phone_is_valid(const std::string& phone)
     return count_numbers(phone) == 11; // for russian tnumbers
 } 
 
-bool RegistrationFilter::user_exist(
+std::shared_ptr<BotUser> RegistrationFilter::user_exist(
     const std::string& phone, 
     const std::string& email
 )
 {
     auto users = BotUser::get_all(
         create_query(other_quiries::_student_exist, phone, email));
-
-    if (users.empty())
-        return false;
-    return true;
+    if (!users.empty())
+        return users.at(0);
+    return nullptr;
 }
 
 void RegistrationFilter::done()
@@ -132,7 +131,7 @@ void RegistrationFilter::run()
                         );
                     }
                     else
-                    {
+                    {   
                         msg.queue.send(
                             msg::user_registration::phone_fail()
                         );
@@ -214,11 +213,12 @@ void RegistrationFilter::run()
             handle<msg::user_registration::check_pupil_exists>(
                 [&](const msg::user_registration::check_pupil_exists& msg)
                 {
-                   
-                    if(user_exist(msg.phone, msg.email))
+                    std::shared_ptr<BotUser> pu = 
+                        user_exist(msg.phone, msg.email);
+                    if(pu)
                     {
                         msg.queue.send(
-                            msg::user_registration::pupil_exists_ok()
+                            msg::user_registration::pupil_exists_ok(pu->chat_id)
                         );
                     }
                     else
