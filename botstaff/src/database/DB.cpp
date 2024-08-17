@@ -13,15 +13,8 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
     try
     {
         pqxx::connection c{URI};
-        if (c.is_open())
-        {
-            std::cout << "db is open";
-        }
-        else
-        {
-            std::cout << "closed";
-        }
-        std::cout << std::endl;
+        if (!c.is_open())
+            throw std::runtime_error("DB open failed\n");
 
         
         if (read_only)
@@ -35,13 +28,14 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
             R = wrk.exec(query);
             wrk.commit();
         }
-        std::cout << "Work is done successfully" << std::endl;
         c.close();
         return R;
     }   
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        std::cout << query << std::endl;
+        std::cout << "Work is failed" << std::endl;
     }
     return R;   
 }   
@@ -352,7 +346,7 @@ std::string ParentBotUser::get_debts_message(long parent_id)
 std::string ParentBotUser::get_rescedule_list(long parent_id)
 {
     auto res = sql_transaction(create_query(
-        other_quiries::_get_rescedule, 
+        other_quiries::_get_reschedule, 
         parent_id));
     std::stringstream ss;
     ss << "<b><u>Latest reschedules:</u></b>\n";
@@ -568,7 +562,6 @@ std::shared_ptr<UserLesson> UserLesson::create()
 
 std::string LessonInfo::get_info_for_teacher()
 {
-    printf("wwww\n");
     return std::format(
         "<b>Student: {}</b>\n"
         "<b>Class start time: {}</b>\n"
@@ -972,4 +965,31 @@ std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id)
         create_query(other_quiries::_get_parent_comments, chat_id);
 
     return UserLesson::get_all(query);
+}
+
+std::string lesson_delete_request_message(long lesson_id, long& teacher_id)
+{
+    std::string query = 
+        create_query(other_quiries::_lesson_delete_request_message, lesson_id); 
+    
+    pqxx::result R = sql_transaction(query); 
+    auto it = R.begin();
+    teacher_id = it->at(0).as<long>();
+    return std::format("Student {} {} requested to cancel class {} in {}", 
+        it->at(1).as<std::string>(),
+        it->at(2).as<std::string>(),
+        it->at(3).as<std::string>(),
+        it->at(4).as<std::string>()
+    );
+}
+
+void create_reschedule(
+    long student_id, 
+    const std::string& date, 
+    const std::string& comment
+)
+{
+    std::string query = create_query(
+        other_quiries::_create_reschedule, student_id, date, comment);
+    sql_transaction(query, false);
 }

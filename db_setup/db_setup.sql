@@ -32,8 +32,9 @@ CREATE TABLE parent_bot_user(
 CREATE TABLE rescedule_table(
     id SERIAL PRIMARY KEY,
     chat_id bigint,
-    date date UNIQUE,
+    date date,
     comment text,
+    UNIQUE(chat_id, date),
     FOREIGN KEY (chat_id) REFERENCES bot_user (chat_id) ON DELETE CASCADE 
 );
 

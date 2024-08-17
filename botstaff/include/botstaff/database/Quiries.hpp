@@ -56,7 +56,7 @@ namespace other_quiries
         WHERE lesson.is_paid=FALSE AND u.chat_id={} ORDER BY \
         lesson.date DESC";
     
-    inline std::string _get_rescedule = 
+    inline std::string _get_reschedule = 
         "SELECT date, comment FROM rescedule_table WHERE \
         chat_id=(SELECT child FROM parent_bot_user WHERE chat_id={}) \
         ORDER BY date DESC LIMIT 5";
@@ -65,6 +65,16 @@ namespace other_quiries
         "SELECT * FROM user_lesson WHERE \
         pupil=(SELECT child FROM parent_bot_user WHERE chat_id={}) \
         ORDER BY date DESC LIMIT 5";
+
+    inline std::string _lesson_delete_request_message = 
+        "SELECT l.teacher, u.first_name, u.last_name, \
+        TO_CHAR(l.date, 'dd/mm/yyyy'), l.time \
+        FROM bot_user as u JOIN (SELECT pupil, teacher, date, time FROM \
+        user_lesson WHERE id={}) as l ON u.chat_id=l.pupil;"; 
+
+    inline std::string _create_reschedule= 
+        "INSERT INTO rescedule_table VALUES \
+        (DEFAULT, {}, '{}', '{}');";
 }   
 
 #endif

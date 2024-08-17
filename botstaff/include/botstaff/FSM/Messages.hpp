@@ -103,6 +103,8 @@ namespace msg
         };
         struct phone_ok
         {
+            std::string phone;
+            phone_ok(std::string _phone):phone(_phone){};
         };
         struct email_ok
         {

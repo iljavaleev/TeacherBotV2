@@ -7,7 +7,7 @@
 #define EN
 
 #ifdef RU
-const static std::vector<std::string> MONTHS_RU = {
+const static std::vector<std::string> MONTHS = {
     "Январь", 
     "Февраль", 
     "Март", 
@@ -23,7 +23,7 @@ const static std::vector<std::string> MONTHS_RU = {
 };
 #endif
 #ifdef EN
-const static std::vector<std::string> MONTHS_EN = {
+const static std::vector<std::string> MONTHS = {
     "January", 
     "February", 
     "March", 

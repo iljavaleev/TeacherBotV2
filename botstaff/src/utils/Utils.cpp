@@ -103,9 +103,9 @@ std::string get_teacher_info(const std::shared_ptr<BotUser>& u)
 std::string get_pupil_info(const std::shared_ptr<BotUser>& u)
 {
     return std::format(
-        "<b>{} {}. Class: {}</b>\n<b>Username</b>: @{}\n"
-        "<b>Phone number</b>: {}\n<b>Email address</b>: {}\n"
-        "<b>Comments:</b> {}", 
+        "<b><u>{} {}. Class: {}</u></b>\n<b><u>Username</u></b>: @{}\n"
+        "<b><u>Phone number></u></b>: {}\n<b><u>Email address</u></b>: {}\n"
+        "<b><u>Comments:</u></b> {}", 
         u->first_name, 
         u->last_name, 
         u->cls, 
@@ -115,3 +115,32 @@ std::string get_pupil_info(const std::shared_ptr<BotUser>& u)
         u->comment
     );
 }
+
+
+void send_current_calendar(
+    const TgBot::Bot& bot,
+    long chat_id, 
+    const bot_roles& role)
+{
+    auto ymd = get_curent_ymd();
+    ymd.day = 1;
+    
+    std::thread send(
+        send_message_with_kb,
+        std::ref(bot),
+        chat_id,
+        std::format(
+            "<b><i>Schedule for {}</i></b>", 
+            MONTHS.at(ymd.month-1)
+        ),
+        Keyboards::calendar_kb()(
+            ymd,
+            role, 
+            chat_id
+        ),
+        "HTML" 
+    );
+    send.detach();
+}
+
+  

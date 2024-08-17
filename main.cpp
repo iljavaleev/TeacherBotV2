@@ -115,6 +115,16 @@ int main() {
      bot.getEvents().onCallbackQuery(
         user_handlers::content_of_for_parent_comment_handler(bot)
     );
+    bot.getEvents().onCallbackQuery(
+        user_handlers::lesson_delete_request(bot)
+    );
+    bot.getEvents().onCallbackQuery(
+        lesson::delete_lesson_reason_handler(bot)
+    );
+
+    
+
+    
    
            
     signal(SIGINT, [](int s) 

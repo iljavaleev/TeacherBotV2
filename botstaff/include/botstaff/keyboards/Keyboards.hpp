@@ -8,7 +8,7 @@
 #include "botstaff/utils/Utils.hpp"
 
 using namespace TgBot;
-
+enum class bot_roles;
 
 namespace Keyboards
 {

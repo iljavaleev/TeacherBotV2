@@ -11,6 +11,8 @@
 #include <string>
 
 #include "botstaff/database/DB.hpp"
+#include "botstaff/keyboards/Keyboards.hpp"
+#include "botstaff/Vocabular.hpp"
 
 enum class bot_roles;
 struct BotUser;
@@ -57,5 +59,10 @@ std::string get_pupil_info(const std::shared_ptr<BotUser>&);
 std::string get_pupil_info(const TgBot::Message::Ptr& message);
 std::string get_teacher_info(const std::shared_ptr<BotUser>&);
 std::string get_comment_text(int);
+void send_current_calendar(
+    const TgBot::Bot& bot,
+    long chat_id, 
+    const bot_roles& role);
+
 
 #endif

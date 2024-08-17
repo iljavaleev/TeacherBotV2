@@ -418,4 +418,31 @@ namespace teacherKeyboards
         return keyboard;
     }
 
+    InlineKeyboardMarkup::Ptr cancel_reason_kb(int lesson_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        vector<InlineKeyboardButton::Ptr> row;
+        
+        InlineKeyboardButton::Ptr btn1(new InlineKeyboardButton);
+        btn1->text = "Student request";
+        btn1->callbackData = std::format("delete_for"
+            " student_request {}", 
+            lesson_id
+        );
+        row.push_back(btn1);
+        keyboard->inlineKeyboard.push_back(row);
+        row.clear();
+
+        InlineKeyboardButton::Ptr btn2(new InlineKeyboardButton);
+        btn2->text = "Other reasons";
+        btn2->callbackData = std::format("delete_for"
+            " other_reasons {}", 
+            lesson_id
+        );
+        row.push_back(btn2);
+        keyboard->inlineKeyboard.push_back(row);
+
+        return keyboard;
+    }
+
 }

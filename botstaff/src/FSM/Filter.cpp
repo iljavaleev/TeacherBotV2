@@ -17,28 +17,30 @@ bool RegistrationFilter::name_is_ok(std::string name)
     return true;
 }
 
-int RegistrationFilter::count_numbers(const std::string& str)
+int RegistrationFilter::count_numbers(std::string& str, bool num_only)
 {
     const std::unordered_set<char> nums = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
-    int c{};
+    int count{};
     for (auto i{str.begin()}; i != str.end(); ++i)
     {
-        if (nums.contains(*i)) ++c;
+        if (nums.contains(*i)) 
+            count++;
+        if (num_only)
+            str.erase(i);
+
     }
-    printf("%d\n", c);
-    return c;
+    return count;
 }
 
-bool RegistrationFilter::phone_is_valid(const std::string& phone)
+bool RegistrationFilter::phone_is_valid(std::string& phone)
 {
     if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$")))
     {   
-        printf("true\n");
         return false;
     }
-    return count_numbers(phone) == 11; // for russian tnumbers
+    return count_numbers(phone, true) == 11; // for russian tnumbers
 } 
 
 std::shared_ptr<BotUser> RegistrationFilter::user_exist(
@@ -123,11 +125,11 @@ void RegistrationFilter::run()
             handle<msg::user_registration::check_phone>(
                 [&](const msg::user_registration::check_phone& msg)
                 {
-                    if(phone_is_valid(msg.content))
+                    std::string phone{msg.content};
+                    if(phone_is_valid(phone))
                     {
-                        
                         msg.queue.send(
-                            msg::user_registration::phone_ok()
+                            msg::user_registration::phone_ok(phone)
                         );
                     }
                     else
@@ -194,8 +196,9 @@ void RegistrationFilter::run()
                 [&](const msg::create_lesson::check_time& msg)
                 {
                     auto pattern = std::regex("^[0-9\\s.:/-]*$");
-                    if(!std::regex_match(msg.content, pattern) || 
-                        count_numbers(msg.content) > 4)
+                    std::string time{msg.content};
+                    if(!std::regex_match(time, pattern) || 
+                        count_numbers(time) > 4)
                     {
                         msg.queue.send(
                             msg::create_lesson::time_fail()
