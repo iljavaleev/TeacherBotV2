@@ -86,7 +86,8 @@ void send_message(
 std::string get_teacher_info(const std::shared_ptr<BotUser>& u)
 {
     return std::format(
-        "<b>{} {}</b>\n<b>Username</b>: {}\n"
+        "<b>{} {}</b>\n"
+        "<b>Username</b>: {}\n"
         "<b>Phone number</b>: {}\n"
         "<b>Email address</b>: {}\n"
         "<b>Comments:</b> {}", 
@@ -104,7 +105,7 @@ std::string get_pupil_info(const std::shared_ptr<BotUser>& u)
 {
     return std::format(
         "<b><u>{} {}. Class: {}</u></b>\n<b><u>Username</u></b>: @{}\n"
-        "<b><u>Phone number></u></b>: {}\n<b><u>Email address</u></b>: {}\n"
+        "<b><u>Phone number</u></b>: {}\n<b><u>Email address</u></b>: {}\n"
         "<b><u>Comments:</u></b> {}", 
         u->first_name, 
         u->last_name, 
@@ -143,4 +144,17 @@ void send_current_calendar(
     send.detach();
 }
 
-  
+void send_error_message(const TgBot::Bot& bot, long chat_id, std::string mess)
+{
+    try
+    {
+        bot.getApi().sendMessage(
+            chat_id,
+            mess
+        ); 
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }    
+}

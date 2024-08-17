@@ -41,17 +41,11 @@ void CreateLesson::choose_date(const std::string& date)
     handle<msg::create_lesson::date_fail>(
         [&](const msg::create_lesson::date_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                lesson->teacher,
-                "Error. Select today's date or a later date"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(
+            bot, 
+            lesson->teacher, 
+            "Error. Select today's date or a later date"
+        );
     });  
 }
 
@@ -103,17 +97,13 @@ void CreateLesson::set_time(const std::string& time)
     handle<msg::create_lesson::time_fail>(
         [&](const msg::create_lesson::time_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                lesson->teacher,
-                "You entered incorrect information. Try again"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        
+        send_error_message(
+            bot, 
+            lesson->teacher, 
+            FSM_voc::lesson_voc::_date_fail
+        );
+
     });  
 }
 
@@ -188,11 +178,11 @@ void CreateLesson::comments_for_parent(const std::string& comments)
     std::string message{};
     if (lesson)
     {
-        message = "Lesson created successfully";
+        message = FSM_voc::lesson_voc::_comments_for_parent_ok;
     }
     else
     {
-        message = "Something went wrong, try again later";
+        message = FSM_voc::lesson_voc::_comments_for_parent_fail;
     }
         
     try
@@ -227,7 +217,6 @@ void CreateLesson::run(const std::string& message)
         std::cerr << e.what() << '\n';
     }       
 }
-//////
 
 void UpdateLesson::send_update_kb()
 {
@@ -235,9 +224,10 @@ void UpdateLesson::send_update_kb()
     {
         bot.getApi().sendMessage(
             lesson_info->lesson->teacher, 
-            std::format(
-                "Choose field to update\n{}", 
-                lesson_info->get_full_info()
+            std::vformat(FSM_voc::lesson_voc::_send_update_kb, 
+                std::make_format_args(
+                    lesson_info->get_full_info()
+                )
             ),
             nullptr,
             nullptr,
@@ -273,17 +263,11 @@ void UpdateLesson::choose_date(const std::string& date)
     handle<msg::create_lesson::date_fail>(
         [&](const msg::create_lesson::date_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                lesson_info->lesson->teacher,
-                "Error. Select today's date or a later date"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(
+            bot, 
+            lesson_info->lesson->teacher, 
+            FSM_voc::lesson_voc::_date_fail
+        );
     });  
 }
 
@@ -313,17 +297,7 @@ void UpdateLesson::set_time(const std::string& time)
     handle<msg::create_lesson::time_fail>(
         [&](const msg::create_lesson::time_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                lesson_info->lesson->teacher,
-                "You entered incorrect information. Try again"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, lesson_info->lesson->teacher);
     });  
 }
 

@@ -2,6 +2,7 @@
 #define LessonCreation_hpp
 
 #include "botstaff/FSM/Headers.hpp"
+#include "botstaff/utils/Utils.hpp"
 #include <functional>
 #include <unordered_map>
 

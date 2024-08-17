@@ -63,6 +63,9 @@ void send_current_calendar(
     const TgBot::Bot& bot,
     long chat_id, 
     const bot_roles& role);
-
+void send_error_message(
+    const TgBot::Bot& bot, 
+    long chat_id, 
+    std::string mess="You entered incorrect information. Try again");
 
 #endif

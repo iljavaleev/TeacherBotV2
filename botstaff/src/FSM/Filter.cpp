@@ -1,4 +1,5 @@
 #include "botstaff/FSM/Filter.hpp"
+#include "botstaff/Vocabular.hpp"
 #include <regex>
 
 using namespace TgBot;
@@ -11,7 +12,7 @@ bool RegistrationFilter::name_is_ok(std::string name)
     if (name.empty())
         return false; 
     
-    if(!std::regex_match(name, std::regex("^[A-Za-z\\s]*$")))
+    if(!std::regex_match(name, std::regex(FSM_voc::filter_voc::_name_is_ok)))
         return false;
     
     return true;
@@ -36,7 +37,8 @@ int RegistrationFilter::count_numbers(std::string& str, bool num_only)
 
 bool RegistrationFilter::phone_is_valid(std::string& phone)
 {
-    if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$")))
+    if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$"))
+    )
     {   
         return false;
     }
@@ -106,7 +108,9 @@ void RegistrationFilter::run()
                 [&](const msg::user_registration::check_class& msg)
                 {
                     if(std::regex_match(
-                        msg.content, std::regex("^[A-Za-z0-9\\s]*$"))
+                        msg.content, std::regex(
+                            FSM_voc::filter_voc::_check_class)
+                        )
                     )
                     {
                         msg.queue.send(
