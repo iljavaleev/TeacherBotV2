@@ -149,6 +149,35 @@ namespace user_handlers
         return Message::Ptr(nullptr);
     }
 
+    Message::Ptr lesson_delete_request::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if (StringTools::split(query->data, ' ').at(0) != "change_lesson_date")
+            return Message::Ptr(nullptr);
+    
+        long lesson_id = 
+            stol(StringTools::split(query->data, ' ').at(1));
+        
+        long teacher_id{};
+        std::string mess = 
+            lesson_delete_request_message(lesson_id, teacher_id);
+        
+        std::thread send(
+            send_message,
+            std::ref(bot),
+            teacher_id,
+            mess,
+            "HTML" 
+        );
+
+        send.detach();
+
+        return bot.getApi().sendMessage(
+            query->message->chat->id, 
+            "We have sent your request to the teacher"
+        );
+    }
 }
 
 namespace user_register_handlers
@@ -273,6 +302,7 @@ namespace user_register_handlers
         } 
         return Message::Ptr(nullptr); 
     }
+    
 
     Message::Ptr start_user_update_handler::operator()(
         const CallbackQuery::Ptr& query
@@ -385,4 +415,6 @@ namespace user_register_handlers
         
         return Message::Ptr(nullptr);
     }
+
+    
 }

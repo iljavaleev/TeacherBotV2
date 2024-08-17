@@ -1,5 +1,6 @@
 #include "botstaff/database/DB.hpp"
 #include "botstaff/database/Quiries.hpp"
+#include "botstaff/Vocabular.hpp"
 #include <stdexcept>
 #include <sstream>
 
@@ -13,15 +14,8 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
     try
     {
         pqxx::connection c{URI};
-        if (c.is_open())
-        {
-            std::cout << "db is open";
-        }
-        else
-        {
-            std::cout << "closed";
-        }
-        std::cout << std::endl;
+        if (!c.is_open())
+            throw std::runtime_error(DB_voc::_db_open_failed);
 
         
         if (read_only)
@@ -35,13 +29,14 @@ pqxx::result sql_transaction(const std::string& query, bool read_only)
             R = wrk.exec(query);
             wrk.commit();
         }
-        std::cout << "Work is done successfully" << std::endl;
         c.close();
         return R;
     }   
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        std::cout << query << std::endl;
+        std::cout << DB_voc::_db_work_failed << std::endl;
     }
     return R;   
 }   
@@ -287,33 +282,25 @@ std::shared_ptr<BotUser> BotUser::create_pupil()
 std::string BotUser::get_full_info()
 {   
     if (role == bot_roles::pupil)
-        return std::format(
-            "<b><u>{} {}</u></b>\n"
-            "<b><u>Class</u></b>: {}\n"
-            "<b><u>Phone</u></b>: {}\n"
-            "<b><u>Email</u></b>: {}\n"
-            "<b><u>Status</u></b>: {}\n"
-            "<b><u>Comment</u></b>:\n{}", 
-            first_name,
-            last_name,
-            cls, 
-            phone, 
-            email,
-            is_active ? "active" : "not active",
-            comment
+        return std::vformat(DB_voc::_get_full_info_pupil, 
+            std::make_format_args(first_name,
+                last_name,
+                cls, 
+                phone, 
+                email,
+                is_active ? DB_voc::_active : DB_voc::_not_active,
+                comment
+            )
         );
-    return std::format(
-            "<b><u>{} {}</u></b>\n"
-            "<b><u>Phone</u></b>: {}\n"
-            "<b><u>Email</u></b>: {}\n"
-            "<b><u>Status</u></b>: {}\n"
-            "<b><u>Comment</u></b>:\n{}", 
-            first_name,
-            last_name,
-            phone, 
-            email,
-            is_active ? "active" : "not active",
-            comment
+    return std::vformat(DB_voc::_get_full_info_teacher, 
+            std::make_format_args(
+                first_name,
+                last_name,
+                phone, 
+                email,
+                is_active ? DB_voc::_active : DB_voc::_not_active,
+                comment
+            )
         );
 }
 
@@ -336,7 +323,7 @@ std::string ParentBotUser::get_debts_message(long parent_id)
         other_quiries::_get_debts, 
         parent_id));
     std::stringstream ss;
-    ss << "<b><u>Your debts:</u></b>\n";
+    ss << DB_voc::_get_debts_message;
     int count{1};
     for (auto it(res.begin()); it != res.end(); ++it, ++count)
     {   
@@ -352,10 +339,10 @@ std::string ParentBotUser::get_debts_message(long parent_id)
 std::string ParentBotUser::get_rescedule_list(long parent_id)
 {
     auto res = sql_transaction(create_query(
-        other_quiries::_get_rescedule, 
+        other_quiries::_get_reschedule, 
         parent_id));
     std::stringstream ss;
-    ss << "<b><u>Latest reschedules:</u></b>\n";
+    ss << DB_voc::_get_rescedule_list;
     int count{1};
     for (auto it(res.begin()); it != res.end(); ++it, ++count)
     {   
@@ -365,7 +352,7 @@ std::string ParentBotUser::get_rescedule_list(long parent_id)
         ss << std::format(
             "{}. {} {} {}\n", count, ymd.day(), ymd.month(), ymd.year()
         );
-        ss << "Comment: ";
+        ss << DB_voc::_comment;
         ss << it->at(1).as<std::string>();
         ss << '\n';
     }
@@ -427,15 +414,15 @@ std::shared_ptr<ParentBotUser> ParentBotUser::create()
 
 std::string ParentBotUser::get_full_info()
 {   
-    return std::format(
-        "<b><u>{} {}</u></b>\n"
-        "<b><u>Telegram</u></b>: @{}\n"
-        "<b><u>Phone</u></b>: {}\n",
-        first_name,
-        last_name,
-        tgusername,
-        phone
-    );
+
+    return std::vformat(DB_voc::_get_full_info_parent, 
+            std::make_format_args(
+                    first_name,
+                    last_name,
+                    tgusername,
+                    phone
+                )
+            );
 }
 
 
@@ -568,77 +555,59 @@ std::shared_ptr<UserLesson> UserLesson::create()
 
 std::string LessonInfo::get_info_for_teacher()
 {
-    printf("wwww\n");
-    return std::format(
-        "<b>Student: {}</b>\n"
-        "<b>Class start time: {}</b>\n"
-        "<b>Objectives</b>: {}\n"
-        "<b>Comments for teacher</b>:\n{}\n"
-        "<b>Payment status</b>: {}", 
-        pupil,
-        time, 
-        objectives, 
-        comment_for_teacher,
-        is_paid
-    );
+    return std::vformat(DB_voc::_get_info_for_teacher, 
+            std::make_format_args(
+                pupil,
+                time, 
+                objectives, 
+                comment_for_teacher,
+                is_paid
+            )
+        );
 };
 
 std::string LessonInfo::get_info_for_pupil()
 {
-    return std::format(
-        "<b>Teacher {}</b>\n"
-        "<b>Class start time: {}</b>\n"
-        "<b>Objectives</b>: {}\n"
-        "<b>Comments for student</b>:\n{}", 
-        teacher,
-        time, 
-        objectives, 
-        comment_for_pupil
-    );
+    return std::vformat(DB_voc::_get_info_for_pupil, 
+            std::make_format_args(
+               teacher,
+                time, 
+                objectives, 
+                comment_for_pupil
+            )
+        );
 }
 
 std::string LessonInfo::get_info_for_parent()
 {
-    return std::format(
-        "<b>Teacher {}</b>\n"
-        "<b>Date</b>: {}\n"
-        "<b>Class start time: {}</b>\n"
-        "<b>Objectives</b>: {}\n"
-        "<b>Comments for parent</b>:\n{}\n"
-        "<b>Payment status</b>: {}", 
-        teacher,
-        date,
-        time, 
-        objectives, 
-        comment_for_parent,
-        is_paid
-    );
+    return std::vformat(DB_voc::_get_full_info_parent, 
+            std::make_format_args(
+               teacher,
+                date,
+                time, 
+                objectives, 
+                comment_for_parent,
+                is_paid
+            )
+        );
 }
 
 std::string LessonInfo::get_full_info()
 {
-    return std::format(
-        "<b>ID: {}</b>\n"
-        "<b><u>Teacher</u>: {}</b>\n"
-        "<b><u>Pupil</u>: {}</b>\n"
-        "<b><u>Date</u></b>: {}\n"
-        "<b><u>Class start time</u>: {}</b>\n"
-        "<b><u>Objectives</u></b>: {}\n"
-        "<b><u>Comments for parent</u></b>:\n{}\n"
-        "<b><u>Comments for student</u></b>:\n{}\n"
-        "<b><u>Comments for teacher</u></b>:\n{}\n" 
-        "<b><u>Payment status</u></b>: {}",
-        id,
-        teacher,
-        pupil, 
-        date, 
-        time,
-        objectives,
-        comment_for_parent,
-        comment_for_pupil,
-        comment_for_teacher,
-        is_paid
-    );
+    return std::vformat(DB_voc::_get_full_info_lesson, 
+            std::make_format_args(
+                id,
+                teacher,
+                pupil, 
+                date, 
+                time,
+                objectives,
+                comment_for_parent,
+                comment_for_pupil,
+                comment_for_teacher,
+                is_paid
+            )
+        );
 }
 
 void LessonInfo::set_pupil(long chat_id)
@@ -651,7 +620,7 @@ void LessonInfo::set_pupil(long chat_id)
 void LessonInfo::set_is_paid(bool paid)
 {
     lesson->is_paid = paid;
-    is_paid = paid ? "yes" : "no";
+    is_paid = paid ? DB_voc::_yes : DB_voc::_no;
 }
 
 void LessonInfo::set_date(const std::string& _date)
@@ -769,28 +738,23 @@ std::string get_comment_text(int id)
     std::string last_name{it->at(2).as<std::string>()};
     std::string comment_for_teacher{it->at(3).as<std::string>()};
     
-    return std::format(
-        "<b>Student: {} {}</b>\n<b>Date: {}</b>\n\n<b>Your comments</b>: {}\n", 
-        date, first_name, last_name, comment_for_teacher);
+    return std::vformat(DB_voc::_get_comment_text, std::make_format_args(
+               date, first_name, last_name, comment_for_teacher));
 }
 
 std::string get_pupil_info(const TgBot::Message::Ptr& message)
 {
     auto u = BotUser::get(message->chat->id);
-    return std::format(
-        "<b>{} {} {}</b>\n\
-        <b>Username</b>: {}\n\
-        <b>Phone number</b>: {}\n\
-        <b>Email address</b>:{}\n\
-        <b>Comments:</b>{}", 
-        u->first_name, 
-        u->last_name, 
-        u->cls, 
-        u->tgusername, 
-        u->phone, 
-        u->email, 
-        u->comment
-    );
+    
+    return std::vformat(DB_voc::_get_pupil_info, 
+        std::make_format_args(
+            u->first_name, 
+            u->last_name, 
+            u->cls, 
+            u->tgusername, 
+            u->phone, 
+            u->email, 
+            u->comment));
 }
 
 void get_comments_for_kb(InlineKeyboardMarkup::Ptr kb, long chat_id)
@@ -893,7 +857,7 @@ std::string get_user_lesson_info(
 {   
     std::shared_ptr<UserLesson> user_lesson = UserLesson::get(user_lesson_id);
     if (!user_lesson->id)
-        return "Error, try again later";
+        return DB_voc::_error;
     LessonInfo info(user_lesson);
     if (role == bot_roles::teacher or role == bot_roles::admin)
         return info.get_info_for_teacher();
@@ -972,4 +936,34 @@ std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id)
         create_query(other_quiries::_get_parent_comments, chat_id);
 
     return UserLesson::get_all(query);
+}
+
+std::string lesson_delete_request_message(long lesson_id, long& teacher_id)
+{
+    std::string query = 
+        create_query(other_quiries::_lesson_delete_request_message, lesson_id); 
+    
+    pqxx::result R = sql_transaction(query); 
+    auto it = R.begin();
+    teacher_id = it->at(0).as<long>();
+    
+    return std::vformat(DB_voc::_lesson_delete_request_message, 
+        std::make_format_args(
+                it->at(1).as<std::string>(),
+                it->at(2).as<std::string>(),
+                it->at(3).as<std::string>(),
+                it->at(4).as<std::string>()
+            )
+        );
+}
+
+void create_reschedule(
+    long student_id, 
+    const std::string& date, 
+    const std::string& comment
+)
+{
+    std::string query = create_query(
+        other_quiries::_create_reschedule, student_id, date, comment);
+    sql_transaction(query, false);
 }

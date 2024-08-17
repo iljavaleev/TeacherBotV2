@@ -551,20 +551,45 @@ namespace lesson
         return Message::Ptr(nullptr);
     }
     
-    Message::Ptr delete_lesson_handler::operator()(
+    Message::Ptr delete_lesson_reason_handler::operator()(
         const CallbackQuery::Ptr& query
     )
     {
         if(StringTools::split(query->data, ' ').at(0) == "delete_lesson")
         {   
             
-            int lesson_id = stoi(
-                StringTools::split(query->data, ' ').at(1)
+            int lesson_id = 
+                stoi(StringTools::split(query->data, ' ').at(1));
+           
+            std::thread send(
+                send_message_with_kb,
+                std::ref(bot),
+                query->message->chat->id, 
+                "Select the reason for canceling the lesson",
+                teacherKeyboards::cancel_reason_kb(lesson_id),
+                "HTML"
             );
+            send.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
+    Message::Ptr delete_lesson_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if(StringTools::split(query->data, ' ').at(0) == "delete_for")
+        {   
+            
+            auto data = StringTools::split(query->data, ' ');
+            std::string reason = data.at(1);
+            reason.at(reason.find('_')) = ' ';
+            long lesson_id = std::stol(data.at(2));
             
             try
             {
-                UserLesson::destroy(lesson_id);
+                std::shared_ptr<UserLesson> ul = UserLesson::destroy(lesson_id);
+                create_reschedule(ul->pupil, ul->date, reason);
             }
             catch(const std::exception& e)
             {
@@ -582,6 +607,7 @@ namespace lesson
         }
         return Message::Ptr(nullptr);
     }
+
 }
 
 

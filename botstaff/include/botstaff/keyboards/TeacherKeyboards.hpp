@@ -36,6 +36,7 @@ namespace teacherKeyboards
         long chat_id, bool update_lesson=false
     );
     InlineKeyboardMarkup::Ptr update_lesson_info_kb(int lesson_id);
+    InlineKeyboardMarkup::Ptr cancel_reason_kb(int lesson_id);
 }
 
 #endif

@@ -391,24 +391,17 @@ void get_users_for_kb(
 void get_debts_for_kb(TgBot::InlineKeyboardMarkup::Ptr kb, long chat_id);
 void change_debt_status(long lesson_id);
 
-
 bot_roles get_role(long chat_id);
 bool is_admin(long chat_id);
 bool is_teacher(long chat_id);
 std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id);
-// template<typename FT, typename RT, typename PK> 
-// static std::vector<std::shared_ptr<RT>> get_all_related(PK pk)
-// {
-//     std::vector<std::shared_ptr<RT>> objects;
-    
-//     pqxx::result res = sql_transaction(FT::GetAllRelated(pk));
-//     for (auto i{res.begin()}; i != res.end(); ++i)
-//     {
-//         objects.emplace_back(RT::construct(*i));
-//     }
-//     return objects;
-// }
+std::string lesson_delete_request_message(long lesson_id, long& teacher_id);
 
+void create_reschedule(
+    long student_id, 
+    const std::string& date, 
+    const std::string& comment
+);
 
 
 #endif 

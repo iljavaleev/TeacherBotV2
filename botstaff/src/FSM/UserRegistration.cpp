@@ -174,7 +174,7 @@ void UserRegistration::get_phone(const std::string& phone)
         [&](const msg::user_registration::phone_ok& msg)
     {
         state = &UserRegistration::get_email;
-        user->phone = phone;
+        user->phone = msg.phone;
         try
         {
             bot.getApi().sendMessage(
@@ -442,7 +442,7 @@ void UpdateUser::change_phone(const std::string& phone)
     handle<msg::user_registration::phone_ok>(
         [&](const msg::user_registration::phone_ok& msg)
     {
-        user->phone = phone;
+        user->phone = msg.phone;
         send_update_kb();
     }).
     handle<msg::user_registration::phone_fail>(
@@ -596,7 +596,7 @@ void ParentRegistration::get_child_phone(const std::string& phone)
     handle<msg::user_registration::phone_ok>(
         [&](const msg::user_registration::phone_ok& msg)
     {
-        child_phone = phone;
+        child_phone = msg.phone;
     }).
     handle<msg::user_registration::phone_fail>(
         [&](const msg::user_registration::phone_fail& msg)
@@ -767,7 +767,7 @@ void ParentRegistration::get_phone(const std::string& phone)
         [&](const msg::user_registration::phone_ok& msg)
     {
         state = &ParentRegistration::agreement;
-        user->phone = phone;
+        user->phone = msg.phone;
         try
         {
             bot.getApi().sendMessage(

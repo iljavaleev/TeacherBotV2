@@ -52,8 +52,8 @@ namespace command_handlers
         }
         else if(role == bot_roles::pupil)
         {
-            mes = "Pupil menu";
-            kb = UserKeyboards::create_user_start_kb(chat_id);
+            send_current_calendar(bot, chat_id, role);
+            return Message::Ptr(nullptr);
         }
         else if(role == bot_roles::parent)
         {
@@ -71,7 +71,7 @@ namespace command_handlers
         else
         {
             mes = "Unregistred users menu";
-            kb = UserKeyboards::create_user_start_kb(chat_id, false);
+            kb = UserKeyboards::create_user_start_kb(chat_id);
         } 
   
         std::thread send(
@@ -113,28 +113,10 @@ namespace handlers
     {
        if (StringTools::split(query->data, ' ').at(0) == "calendar") 
         {
-            auto ymd = get_curent_ymd();
-            ymd.day = 1;
             bot_roles role = 
                 StringTools::split(query->data, ' ').at(1) == 
                     "teacher" ? bot_roles::teacher : bot_roles::pupil;
-            
-            std::thread send(
-                send_message_with_kb,
-                std::ref(bot),
-                query->message->chat->id,
-                std::format(
-                    "<b><i>Schedule for {}</i></b>", 
-                    MONTHS_EN.at(ymd.month-1)
-                ),
-                Keyboards::calendar_kb()(
-                    ymd,
-                    role, 
-                    query->message->chat->id
-                ),
-                "HTML" 
-            );
-            send.detach();
+            send_current_calendar(bot, query->message->chat->id, role);
         }
         return Message::Ptr(nullptr); 
     }
@@ -148,7 +130,7 @@ namespace handlers
             bool update = true ? info.at(4) == "true" : false;
             bot_roles role = 
                 info.at(5) == 
-                    "teacher" ? bot_roles::teacher : bot_roles::pupil;
+                    "1" ? bot_roles::teacher : bot_roles::pupil;
             
             if (info.at(1) == "<<")
             {   
@@ -164,7 +146,7 @@ namespace handlers
                 query->message->chat->id,
                 std::format(
                     "<b><i>Schedule for {}</i></b>", 
-                    MONTHS_EN.at(ymd.month-1)
+                    MONTHS.at(ymd.month-1)
                 ),
                 Keyboards::calendar_kb()(
                     ymd,

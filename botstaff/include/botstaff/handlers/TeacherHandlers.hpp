@@ -159,11 +159,17 @@ namespace lesson
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
     
-    
     class delete_lesson_handler{
         const TgBot::Bot& bot;
     public:
         delete_lesson_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
+
+    class delete_lesson_reason_handler{
+        const TgBot::Bot& bot;
+    public:
+        delete_lesson_reason_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
 }

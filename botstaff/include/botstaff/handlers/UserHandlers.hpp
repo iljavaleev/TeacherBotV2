@@ -46,6 +46,13 @@ namespace user_handlers
         content_of_for_parent_comment_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
+
+    class lesson_delete_request{
+        const TgBot::Bot& bot;
+    public:
+        lesson_delete_request(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
 }
 
 namespace user_register_handlers
@@ -113,6 +120,8 @@ namespace user_register_handlers
         ):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
+
+   
     
 }
 

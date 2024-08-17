@@ -132,7 +132,6 @@ namespace Keyboards
             chat_id, 
             role
         );
-
         int first_day_number = day_number(ymd);
         int month_day_number = days_in_month(ymd);
         int count = 1;
