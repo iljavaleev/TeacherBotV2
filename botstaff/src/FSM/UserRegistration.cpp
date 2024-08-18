@@ -7,17 +7,7 @@ void UserRegistration::choose_teacher(const std::string& chat_id)
 {
     user->teacher = std::stol(chat_id);
     state = &UserRegistration::get_class;
-    try
-    {
-        bot.getApi().sendMessage(
-            user->chat_id, 
-            "Enter your class"
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_cls);
 }
 
 
@@ -38,33 +28,13 @@ void UserRegistration::get_class(const std::string& cls)
         
         state = &UserRegistration::get_first_name;
         user->cls = cls;
-        
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your first name"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_message(
+            bot, user->chat_id, FSM_voc::user_reg_voc::_first_name);
     }).
     handle<msg::user_registration::class_fail>(
         [&](const msg::user_registration::class_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }  
+        send_error_message(bot, user->chat_id);
     });
 };
 
@@ -85,32 +55,13 @@ void UserRegistration::get_first_name(const std::string& name)
     {
         state = &UserRegistration::get_last_name;
         user->first_name = name;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your last name"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_message(
+            bot, user->chat_id,FSM_voc::user_reg_voc::_last_name);
     }).
     handle<msg::user_registration::first_name_fail>(
         [&](const msg::user_registration::first_name_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -130,32 +81,12 @@ void UserRegistration::get_last_name(const std::string& name)
     {
         state = &UserRegistration::get_phone;
         user->last_name = name;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your phone number"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_phone);
     }).
     handle<msg::user_registration::last_name_fail>(
         [&](const msg::user_registration::last_name_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -175,33 +106,12 @@ void UserRegistration::get_phone(const std::string& phone)
     {
         state = &UserRegistration::get_email;
         user->phone = msg.phone;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your email"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
-        
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_email);
     }).
     handle<msg::user_registration::phone_fail>(
         [&](const msg::user_registration::phone_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -221,36 +131,17 @@ void UserRegistration::get_email(const std::string& email)
     {
         state = &UserRegistration::agreement;
         user->email = email;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You consent to the processing of personal data?",
-                nullptr, 
-                nullptr, 
-                Keyboards::agreement_kb()
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
-        
+        send_message_with_kb(
+            bot, 
+            user->chat_id, 
+            FSM_voc::user_reg_voc::_agreement,
+            Keyboards::agreement_kb()
+        );
     }).
     handle<msg::user_registration::email_fail>(
         [&](const msg::user_registration::email_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -259,7 +150,7 @@ void UserRegistration::agreement(const std::string& choice)
     std::string mess{};
     long chat_id = user->chat_id;
     if (choice == "no")
-        mess = "<b>Registration is not completed<\b>";
+        mess = FSM_voc::user_reg_voc::_finish_no;
     else
     {   
         try
@@ -276,26 +167,14 @@ void UserRegistration::agreement(const std::string& choice)
         
         if (user)
         {
-            mess = "Registration completed successfully";
+            mess = FSM_voc::user_reg_voc::_finish_yes;
         }
         else
         {
-            mess = "Something is wrong, try again later";
+            mess = FSM_voc::user_reg_voc::_finish_error;
         }
     }
-
-    try
-    {
-        bot.getApi().sendMessage(
-            chat_id, 
-            std::move(mess)
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return;
-    }  
+    send_message(bot, chat_id, mess);
 }
 
 void UserRegistration::done()
@@ -320,39 +199,13 @@ void UserRegistration::run(const std::string& message)
 
 void UpdateUser::send_update_kb()
 {
-    try
-    {
-        bot.getApi().sendMessage(
-            teacher_id, 
-            std::format(
-                "Choose field to update\n{}", 
-                user->get_full_info()
-            ),
-            nullptr,
-            nullptr,
-            teacherKeyboards::update_user_info_kb(user->role),
-            "HTML"
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
-}
-
-void UpdateUser::send_error_msg(const std::string msg)
-{
-    try
-    {
-        bot.getApi().sendMessage(
-            teacher_id, 
-            msg
-        ); 
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message_with_kb(
+        bot, 
+        teacher_id,
+        vformat(FSM_voc::user_reg_voc::_update_kb, std::make_format_args(
+            user->get_full_info())), 
+        teacherKeyboards::update_user_info_kb(user->role)
+    );
 }
 
 void UpdateUser::change_first_name(const std::string& name)
@@ -375,7 +228,7 @@ void UpdateUser::change_first_name(const std::string& name)
     handle<msg::user_registration::first_name_fail>(
         [&](const msg::user_registration::first_name_fail& msg)
     {
-       send_error_msg();
+       send_error_message(bot, teacher_id);
     });
 }
 
@@ -399,7 +252,7 @@ void UpdateUser::change_last_name(const std::string& name)
     handle<msg::user_registration::last_name_fail>(
         [&](const msg::user_registration::last_name_fail& msg)
     {
-       send_error_msg();
+        send_error_message(bot, teacher_id);
     });
 }
 
@@ -424,7 +277,7 @@ void UpdateUser::change_class(const std::string& cls)
     handle<msg::user_registration::class_fail>(
         [&](const msg::user_registration::class_fail& msg)
     {
-       send_error_msg();
+        send_error_message(bot, teacher_id);
     });
 };
 
@@ -448,7 +301,7 @@ void UpdateUser::change_phone(const std::string& phone)
     handle<msg::user_registration::phone_fail>(
         [&](const msg::user_registration::phone_fail& msg)
     {
-        send_error_msg();
+        send_error_message(bot, teacher_id);
     });
 }
 
@@ -473,7 +326,7 @@ void UpdateUser::change_email(const std::string& email)
     handle<msg::user_registration::email_fail>(
         [&](const msg::user_registration::email_fail& msg)
     {
-        send_error_msg();
+        send_error_message(bot, teacher_id);
     });
 }
 
@@ -491,7 +344,7 @@ void UpdateUser::change_active_status(const std::string& status)
         user->is_active = false;
     else
     {
-        send_error_msg();
+        send_error_message(bot, teacher_id);
         return;
     }
     send_update_kb();
@@ -550,33 +403,12 @@ void ParentRegistration::get_child_email(const std::string& email)
     {
         child_email = email;
         state = &ParentRegistration::get_child_phone;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your child phone number"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
-        
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_child_phone);
     }).
     handle<msg::user_registration::email_fail>(
         [&](const msg::user_registration::email_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        send_error_message(bot, user->chat_id);
     });
 
     
@@ -601,18 +433,8 @@ void ParentRegistration::get_child_phone(const std::string& phone)
     handle<msg::user_registration::phone_fail>(
         [&](const msg::user_registration::phone_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            );
-            return; 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
+        return;
     });
 
     filter_sender.send(
@@ -630,34 +452,13 @@ void ParentRegistration::get_child_phone(const std::string& phone)
     {
         state = &ParentRegistration::get_first_name;
         user->child = msg.child_id;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your first name"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
-        
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_first_name);
     }).
     handle<msg::user_registration::pupil_exists_fail>(
         [&](msg::user_registration::pupil_exists_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Sorry, there is no student with this " 
-                "phone number and email address. Check the information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        send_message(
+            bot, user->chat_id, FSM_voc::user_reg_voc::_child_not_found);
         return;    
     });
 }
@@ -678,32 +479,12 @@ void ParentRegistration::get_first_name(const std::string& name)
     {
         state = &ParentRegistration::get_last_name;
         user->first_name = name;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your last name"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_last_name);
     }).
     handle<msg::user_registration::first_name_fail>(
         [&](const msg::user_registration::first_name_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -723,32 +504,12 @@ void ParentRegistration::get_last_name(const std::string& name)
     {
         state = &ParentRegistration::get_phone;
         user->last_name = name;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "Enter your phone number"
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        send_message(bot, user->chat_id, FSM_voc::user_reg_voc::_phone);
     }).
     handle<msg::user_registration::last_name_fail>(
         [&](const msg::user_registration::last_name_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -768,36 +529,18 @@ void ParentRegistration::get_phone(const std::string& phone)
     {
         state = &ParentRegistration::agreement;
         user->phone = msg.phone;
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You consent to the processing of personal data?",
-                nullptr, 
-                nullptr, 
-                Keyboards::agreement_kb()
-            );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
         
+        send_message_with_kb(
+            bot, 
+            user->chat_id, 
+            FSM_voc::user_reg_voc::_agreement, 
+            Keyboards::agreement_kb()
+        );
     }).
     handle<msg::user_registration::phone_fail>(
         [&](const msg::user_registration::phone_fail& msg)
     {
-        try
-        {
-            bot.getApi().sendMessage(
-                user->chat_id, 
-                "You entered incorrect information"
-            ); 
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_error_message(bot, user->chat_id);
     });
 }
 
@@ -806,12 +549,11 @@ void ParentRegistration::agreement(const std::string& choice)
     std::string mess{};
     long chat_id = user->chat_id;
     if (choice == "no")
-        mess = "<b>Registration is not completed<\b>";
+        mess = FSM_voc::user_reg_voc::_finish_no;
     else
     {   
         try
         {
-            std::cout << user->get_full_info() << std::endl;
             user->create();
         }
         catch(const std::exception& e)
@@ -819,21 +561,10 @@ void ParentRegistration::agreement(const std::string& choice)
             std::cerr << e.what() << '\n';
         }
         
-        mess = "Registration completed successfully";
+        mess = FSM_voc::user_reg_voc::_finish_yes;
     }
 
-    try
-    {
-        bot.getApi().sendMessage(
-            chat_id, 
-            std::move(mess)
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return;
-    }  
+    send_message(bot, chat_id, mess);
 }
 
 void ParentRegistration::done()

@@ -42,12 +42,12 @@ namespace command_handlers
         InlineKeyboardMarkup::Ptr kb(nullptr);
         if (role == bot_roles::admin)
         {
-            mes = "Admin menu";
+            mes = handlers_voc::handlers::_menu_adm;
             kb = teacherKeyboards::create_teacher_start_kb(true);
         }
         else if(role == bot_roles::teacher)
         {
-            mes = "Teacher menu";
+            mes = handlers_voc::handlers::_menu_tchr;
             kb = teacherKeyboards::create_teacher_start_kb(false);
         }
         else if(role == bot_roles::pupil)
@@ -57,20 +57,20 @@ namespace command_handlers
         }
         else if(role == bot_roles::parent)
         {
-            mes = "Parent menu";
+            mes = handlers_voc::handlers::_menu_par;
             kb = UserKeyboards::create_parent_start_kb(chat_id);
         }
         else if(role == bot_roles::teacher_not_active)
         {
-            mes = "Please wait for administrator to activate your account";
+            mes = handlers_voc::handlers::_menu_tchr_not;
         }
         else if(role == bot_roles::pupil_not_active)
         {
-            mes ="Please wait for your teacher to activate your account";
+            mes = handlers_voc::handlers::_menu_pup_not;
         }
         else
         {
-            mes = "Unregistred users menu";
+            mes = handlers_voc::handlers::_menu_anon;
             kb = UserKeyboards::create_user_start_kb(chat_id);
         } 
   
@@ -98,7 +98,7 @@ namespace command_handlers
             send_message,
             std::ref(bot), 
             chat_id,
-            "Cancel command",
+            handlers_voc::handlers::_cancel,
             "HTML"
         ); 
         send.detach();
@@ -144,10 +144,8 @@ namespace handlers
                 send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id,
-                std::format(
-                    "<b><i>Schedule for {}</i></b>", 
-                    MONTHS.at(ymd.month-1)
-                ),
+                std::vformat(handlers_voc::handlers::_next_month, 
+                    std::make_format_args(MONTHS.at(ymd.month-1))),
                 Keyboards::calendar_kb()(
                     ymd,
                     role, 
@@ -180,8 +178,9 @@ namespace handlers
                 send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id,
-                kb->inlineKeyboard.empty() ? "No classes today" : 
-                "Today's classes",
+                kb->inlineKeyboard.empty() ? 
+                handlers_voc::handlers::_calendar_day : 
+                handlers_voc::handlers::_calendar_day_not,
                 kb,
                 "HTML" 
             );

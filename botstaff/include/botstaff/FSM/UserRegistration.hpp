@@ -2,21 +2,9 @@
 #define UserRegistration_hpp
 
 #include "Headers.hpp"
+#include "botstaff/Vocabular.hpp"
 
 using namespace TgBot;
-
-
-namespace user_reg_messages
-{
-    inline std::string _first_name = "Enter name";
-    inline std::string _last_name = "Enter surname";
-    inline std::string _class = "Set student's class";
-    inline std::string _phone = "Set phone number";
-    inline std::string _email= "Set email address";
-    inline std::string _comments = "Enter comments about student";
-    inline std::string _status = "Activate user? y/n";
-    inline std::string _finish = "Editing was comleted";
-}
 
 inline std::unordered_map<std::string, std::string> user_update_messages = 
 {
@@ -99,8 +87,6 @@ class UpdateUser
     void change_active_status(const std::string& status);
 
     void send_update_kb();
-    void send_error_msg(const std::string msg = 
-        "You entered incorrect information");
     
     UpdateUser(const UpdateUser&) = delete;
     UpdateUser& operator=(const UpdateUser&) = delete;

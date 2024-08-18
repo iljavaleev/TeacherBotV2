@@ -122,9 +122,84 @@ namespace FSM_voc
         inline std::string _send_update_kb = 
             "Выберите поле для обновления\n{}";
     }
+    
+    namespace user_reg_voc
+    {
+        inline std::string _cls = 
+            "Введите класс обучения с литерой (8а, 5б и т.д)";
+        inline std::string _first_name = "Введите ваше имя";
+        inline std::string _last_name = "Введите вашу фамилию";
+        inline std::string _phone = "Введите номер вашего телефона";
+        inline std::string _email = "Введите адрес электронной почты";
+        inline std::string _agreement = 
+            "Вы даете согласие на хранение и обработку персональных данных?";
+        inline std::string _finish_no = 
+            "<b>Регистрация не завершена<\b>";          
+        inline std::string _finish_yes = 
+            "Вы успешно прошли регистрацию"; 
+        inline std::string _finish_error = 
+            "Что-то пошло не так, попробуйте позднее"; 
+        
+        inline std::string _update_kb =  "Выберите поле для обновления\n{}";
+        inline std::string _child_phone = "Введите телефон номер телефона вашего ребенка";
+        inline std::string _child_not_found = 
+            "Извините, ученика с таким телефоном и адресом почты нет в нашей базе " 
+            "Уточните информацию и повторите попытку позднее";
+        
+    }
 
 }
+namespace handlers_voc
+{
+    namespace handlers
+    {
+        inline std::string _menu_adm = "Меню администратора";
+        inline std::string _menu_tchr = "Меню учителя";
+        inline std::string _menu_par = "Меню родителя";
+        inline std::string _menu_tchr_not = 
+            "Пожалуйста, подождите, когда администратор активирует ваш аккаунт";
+        inline std::string _menu_pup_not = 
+            "Пожалуйста, подождите, когда ваш учитель активирует аккаунт";
+        inline std::string _menu_anon = 
+            "Меню для незарегестрированных пользователей";
 
+        inline std::string _cancel = "Кнопка отмены";
+        inline std::string _next_month = "<b><i>Расписание на {}</i></b>";
+        inline std::string _calendar_day = "Занятия на сегодня";
+        inline std::string _calendar_day_not = "Сегодня нет занятий";
+    };
+    namespace teacher
+    {
+        inline std::string _comments = "Ваши последние комментарии";
+        inline std::string _debts = "Список задолжностей студента";
+        inline std::string _payment = "Изменить статус опланы?";
+        inline std::string _change_debt_status = "Статус был изменен";
+        inline std::string _change_debt_status_not = "Ok";
+        inline std::string _error = "Что-то пошло не так, попробуйте позднее";
+        inline std::string _category = "Выберите категорию";
+        inline std::string _teacher_active = "Список активных учителей";
+        inline std::string _teacher_not_active = "Список кандидатов";
+        inline std::string _empty = "Пока здесь пусто";
+        inline std::string _student_active = "Список активных учеников";
+        inline std::string _student_not_active = "Список кандидатов";
+        inline std::string _reg_to_user = "Вы завершили регистрацию";
+        inline std::string _reg_user =  "Пользователь добавлен";
+        inline std::string _delete_user =  "Пользователь был удален";
+        inline std::string _update_user =  "Выберите поле для исправления\n{}";
+        inline std::string _delete_lesson_reason = "Выберите причину отмены урока";
+        inline std::string _delete_lesson = "Урок отменен";
+    };
+
+    namespace user
+    {
+        inline std::string _parent_comments = "<b><u>Выбор коментариев по дате</u></b>";
+        inline std::string _lesson_request = "Мы отправили ваш запрос учителю";
+        inline std::string _child_email = "Ввведите электронный адрес ребенка";
+        inline std::string _choose_teacher = "<b>Выберите вашего преподавателя</b>";
+        inline std::string _name = "<b>Введите имя</b>";
+        inline std::string _update_user =  "Выберите поле для исправления\n{}";
+    };
+}
 #endif
 #ifdef EN
 const static std::vector<std::string> MONTHS = {
@@ -248,8 +323,198 @@ namespace FSM_voc
 
     namespace user_reg_voc
     {
+        inline std::string _cls = "Enter your class";
+        inline std::string _first_name = "Enter your first name";
+        inline std::string _last_name = "Enter your last name";
+        inline std::string _phone = "Enter your phone number";
+        inline std::string _email = "Enter your email";
+        inline std::string _agreement = 
+            "You consent to the processing of personal data?";
+        inline std::string _finish_no = 
+            "<b>Registration is not completed<\b>";          
+        inline std::string _finish_yes = 
+            "Registration completed successfully"; 
+        inline std::string _finish_error = 
+            "Something is wrong, try again later"; 
         
+        inline std::string _update_kb =  "Choose field to update\n{}";
+        inline std::string _child_phone = "Enter your child phone number";
+        inline std::string _child_not_found = 
+            "Sorry, there is no student with this " 
+            "phone number and email address. Check the information";
     }
 }
+
+namespace handlers_voc
+{
+    namespace handlers
+    {
+        inline std::string _menu_adm = "Admin menu";
+        inline std::string _menu_tchr = "Teacher menu";
+        inline std::string _menu_par = "Parent menu";
+        inline std::string _menu_tchr_not = "Please wait for administrator to activate your account";
+        inline std::string _menu_pup_not = "Please wait for your teacher to activate your account";
+        inline std::string _menu_anon = "Unregistred users menu";
+
+        inline std::string _cancel = "Cancel command";
+        inline std::string _next_month = "<b><i>Schedule for {}</i></b>";
+        inline std::string _calendar_day = "Today's classes";
+        inline std::string _calendar_day_not = "No classes today";
+    };
+    namespace teacher
+    {
+        inline std::string _comments = "Your latest comments";
+        inline std::string _debts = "List of student debts";
+        inline std::string _payment = "Change payment status?";
+        inline std::string _change_debt_status = "Satus was changed successfully";
+        inline std::string _change_debt_status_not = "Ok";
+        inline std::string _error = "Somthing went wrong, try later";
+        inline std::string _category = "Choose category";
+        inline std::string _teacher_active = "List of active teachers";
+        inline std::string _teacher_not_active = "List of candidats";
+        inline std::string _empty = "It's empty for now";
+        inline std::string _student_active = "List of students";
+        inline std::string _student_not_active = "List of candidats";
+        inline std::string _reg_to_user =  "You are registered";
+        inline std::string _reg_user =  "User added";
+        inline std::string _delete_user =  "User was removed";
+        inline std::string _update_user =  "Choose field to update\n{}";
+        inline std::string _delete_lesson_reason = "Select the reason for canceling the lesson";
+        inline std::string _delete_lesson = "You canceled your lesson";
+    };
+
+    namespace user
+    {
+        inline std::string _parent_comments = "<b><u>Select comment by date</u></b>";
+        inline std::string _lesson_request = "We have sent your request to the teacher";
+        inline std::string _child_email = "Enter your child's email";
+        inline std::string _choose_teacher = "<b>Choose your teacher</b>";
+        inline std::string _name = "<b>Enter your name</b>";
+        inline std::string _update_user =  "Choose field to update\n{}";
+    };
+}
+
+namespace keyboards_voc
+{
+    namespace keyboards
+    {
+        inline std::vector<std::string> DAYS = { 
+            "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" 
+        };
+
+        inline std::string _yes = "Yes";
+        inline std::string _no = "No";
+        inline std::string _today = "Today {}/{}/{}";
+        inline std::string _day_cal = "Calendar";
+        inline std::string _pup = "List of students";
+        inline std::string _create_lesson = "Create new lesson";
+        inline std::string _day_reschedule = "Request to reschedule a class";
+        inline std::string _lesson_edit = "Edit";
+        inline std::string _lesson_delete = "Delete";
+    };
+
+    namespace teacher
+    {
+        inline std::string _yes = "Yes";
+        inline std::string _no = "No";
+        inline std::string _today = "Today {}/{}/{}";
+        inline std::string _teach = "List of teachers";
+        inline std::string _comments = "Comments";
+        inline std::string _debts = "Debt list";
+
+        inline std::string _list_stud_active = "List of active students";
+        inline std::string _list_not_active = "Request list";
+
+        inline std::string _list_teach_active = "List of active teachers";
+        inline std::string _activate = "Activate";
+        inline std::string _user_edit = "Edit";
+        inline std::string _user_delete = "Delete";
+        
+        inline std::string _kb_name = "Change name";
+        inline std::string _kb_sname = "Change surname";
+        inline std::string _kb_class = "Change class";
+        inline std::string _kb_phone = "Change phone";
+        inline std::string _kb_email = "Change email";
+        inline std::string _kb_comment = "Change comment";
+        inline std::string _kb_status = "Change status";
+        inline std::string _kb_finish = "Finish editing";
+
+        inline std::string _lkb_date = "Change date";
+        inline std::string _lkb_time = "Change time";
+        inline std::string _lkb_std = "Change student";
+        inline std::string _lkb_obj = "Change objectives";
+        inline std::string _lkb_comment_pup = "Change comments for pupil";
+        inline std::string _lkb_comment_par = "Change comments for parent";
+        inline std::string _lkb_comment_teach = "Change comments for teacher";
+        inline std::string _lkb_status = "Change payment status";
+        inline std::string _lkb_finish = "Finish editing";
+
+        inline std::string _cancel_reason_s = "Student request";
+        inline std::string _cancel_reason_o = "Other reasons";
+    };
+
+    namespace user
+    {
+        inline std::string _reg = "Registration";
+        inline std::string _parent_resc = "List of class rescheduling";
+        inline std::string _parent_comm = "List of teacher comments";
+        inline std::string _parent_debts = "Student debts";
+
+        inline std::string _role_std = "Student";
+        inline std::string _role_teach = "Teacher";
+        inline std::string _role_par = "Parent";
+    };
+
+}
+
+namespace utils_voc
+{
+    inline std::string _techer_info =  
+        "<b>{} {}</b>\n"
+        "<b>Username</b>: {}\n"
+        "<b>Phone number</b>: {}\n"
+        "<b>Email address</b>: {}\n"
+        "<b>Comments:</b> {}";
+    
+    inline std::string _pupil_info = 
+        "<b><u>{} {}. Class: {}</u></b>\n<b><u>Username</u></b>: @{}\n"
+        "<b><u>Phone number</u></b>: {}\n<b><u>Email address</u></b>: {}\n"
+        "<b><u>Comments:</u></b> {}";
+
+    inline std::string _cal = "<b><i>Schedule for {}</i></b>";
+
+    inline std::string _error = "You entered incorrect information. Try again";
+}
+
+namespace lesson_messges
+{
+    inline std::string _date = "Choose new date for class";
+    inline std::string _pupil = "Choose student for this lesson";
+    inline std::string _time = 
+        "Set lesson start time (like 12 00, 12-00, etc)";
+    inline std::string _objectives = 
+        "Set objectives for this lesson or send random character";
+    inline std::string _comments_for_pupil = 
+        "Enter information for pupil or send random character to skip";
+    inline std::string _comments_for_parent = 
+        "Enter information for parent or send random character to skip";
+    inline std::string _comments_for_teacher = 
+        "Enter information for teacher or send random character to skip";
+    inline std::string _paid = "Service paid: y/n";
+    inline std::string _finish = "Editing was comleted";
+}
+
+namespace user_reg_messages
+{
+    inline std::string _first_name = "Enter name";
+    inline std::string _last_name = "Enter surname";
+    inline std::string _class = "Set student's class";
+    inline std::string _phone = "Set phone number";
+    inline std::string _email= "Set email address";
+    inline std::string _comments = "Enter comments about student";
+    inline std::string _status = "Activate user? y/n";
+    inline std::string _finish = "Editing was comleted";
+}
+
 #endif
 #endif

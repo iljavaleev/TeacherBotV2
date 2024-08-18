@@ -3,28 +3,13 @@
 
 #include "botstaff/FSM/Headers.hpp"
 #include "botstaff/utils/Utils.hpp"
+#include "botstaff/Vocabular.hpp"
 #include <functional>
 #include <unordered_map>
 
 using namespace TgBot;
 
-namespace lesson_messges
-{
-    inline std::string _date = "Choose new date for class";
-    inline std::string _pupil = "Choose student for this lesson";
-    inline std::string _time = 
-        "Set lesson start time (like 12 00, 12-00, etc)";
-    inline std::string _objectives = 
-        "Set objectives for this lesson or send random character";
-    inline std::string _comments_for_pupil = 
-        "Enter information for pupil or send random character to skip";
-    inline std::string _comments_for_parent = 
-        "Enter information for parent or send random character to skip";
-    inline std::string _comments_for_teacher = 
-        "Enter information for teacher or send random character to skip";
-    inline std::string _paid = "Service paid: y/n";
-    inline std::string _finish = "Editing was comleted";
-}
+
 
 inline std::unordered_map<std::string, std::string> lesson_creation_messages = 
 {
