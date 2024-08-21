@@ -9,7 +9,7 @@
 #include "botstaff/utils/Utils.hpp"
 #include "botstaff/database/DB.hpp"
 #include "botstaff/utils/CalendarUtils.hpp"
-
+#include "botstaff/Vocabular.hpp"
 
 using namespace std;
 using namespace TgBot;
@@ -21,9 +21,8 @@ namespace Keyboards
         "calendar_day {} {} {} {}";
     const std::string calendar_kb::update_lesson_cb_data = 
         "update_date_for_lesson {} {}-{}-{}";
-    const std::vector<std::string> calendar_kb::days = { 
-        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" 
-    };
+    const std::vector<std::string> calendar_kb::days = 
+        keyboards_voc::keyboards::DAYS;
 
     int calendar_kb::day_number(YMD date) 
     { 
@@ -98,11 +97,13 @@ namespace Keyboards
         row.push_back(prev_month_btn);
 
         InlineKeyboardButton::Ptr current_btn(new InlineKeyboardButton);
-        current_btn->text = std::format(
-            "Today {}/{}/{}", 
-            ymd.day, 
-            ymd.month, 
-            ymd.year
+        current_btn->text = std::vformat(
+            keyboards_voc::keyboards::_today,
+                std::make_format_args(
+                ymd.day, 
+                ymd.month, 
+                ymd.year
+            )
         );
         current_btn->callbackData = " ";
         row.push_back(current_btn);
@@ -191,12 +192,12 @@ namespace Keyboards
         vector<InlineKeyboardButton::Ptr> row;
 
         InlineKeyboardButton::Ptr admin_calendar_btn(new InlineKeyboardButton);
-        admin_calendar_btn->text = "Calendar";
+        admin_calendar_btn->text = keyboards_voc::keyboards::_day_cal;
         admin_calendar_btn->callbackData = "admin calendar";
         row.push_back(admin_calendar_btn);
 
         InlineKeyboardButton::Ptr list_pupils_btn(new InlineKeyboardButton);
-        list_pupils_btn->text = "List of pupils";
+        list_pupils_btn->text = keyboards_voc::keyboards::_pup;
         list_pupils_btn->callbackData = "admin pupils";
         row.push_back(list_pupils_btn);
 
@@ -210,12 +211,12 @@ namespace Keyboards
         vector<InlineKeyboardButton::Ptr> row;
 
         InlineKeyboardButton::Ptr yes_btn(new InlineKeyboardButton);
-        yes_btn->text = "Yes";
+        yes_btn->text = keyboards_voc::keyboards::_yes;
         yes_btn->callbackData = "agreement yes";
         row.push_back(yes_btn);
 
         InlineKeyboardButton::Ptr no_btn(new InlineKeyboardButton);
-        no_btn->text = "No";
+        no_btn->text =  keyboards_voc::keyboards::_no;
         no_btn->callbackData = "agreement no";
         row.push_back(no_btn);
 
@@ -260,7 +261,7 @@ namespace Keyboards
             InlineKeyboardButton::Ptr create_lesson_btn(
                 new InlineKeyboardButton
             );
-            create_lesson_btn->text = "Create new lesson";
+            create_lesson_btn->text = keyboards_voc::keyboards::_create_lesson;
             create_lesson_btn->callbackData = std::format(
                 "create_lesson {}-{}-{}", 
                 ymd.year, 
@@ -282,7 +283,7 @@ namespace Keyboards
         if (role == bot_roles::pupil)
         {
             InlineKeyboardButton::Ptr change_date_btn(new InlineKeyboardButton);
-            change_date_btn->text = "Request to reschedule a class";
+            change_date_btn->text = keyboards_voc::keyboards::_day_reschedule;
             change_date_btn->callbackData = std::format(
                 "change_lesson_date {}", 
                 lesson_id
@@ -294,7 +295,7 @@ namespace Keyboards
             InlineKeyboardButton::Ptr update_lesson_btn(
                 new InlineKeyboardButton
             );
-            update_lesson_btn->text = "Edit";
+            update_lesson_btn->text = keyboards_voc::keyboards::_lesson_edit;
             update_lesson_btn->callbackData = std::format(
                 "update_lesson {}", 
                 lesson_id
@@ -304,7 +305,7 @@ namespace Keyboards
             InlineKeyboardButton::Ptr delete_lesson_btn(
                 new InlineKeyboardButton
             );
-            delete_lesson_btn->text = "Delete";
+            delete_lesson_btn->text = keyboards_voc::keyboards::_lesson_delete;
             delete_lesson_btn->callbackData = std::format(
                 "delete_lesson {}", 
                 lesson_id

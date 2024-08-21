@@ -45,14 +45,14 @@ void send_message_with_kb(
     long chat_id, 
     const std::string& mess, 
     TgBot::InlineKeyboardMarkup::Ptr kb, 
-    const std::string& pm
+    const std::string& pm="HTML"
 );
 
 void send_message(
     const TgBot::Bot& bot, 
     long chat_id, 
     const std::string& mess,
-    const std::string& pm
+    const std::string& pm="HTML"
 );
 
 std::string get_pupil_info(const std::shared_ptr<BotUser>&);
@@ -66,6 +66,7 @@ void send_current_calendar(
 void send_error_message(
     const TgBot::Bot& bot, 
     long chat_id, 
-    std::string mess="You entered incorrect information. Try again");
+    std::string mess=utils_voc::_error);
+
 
 #endif

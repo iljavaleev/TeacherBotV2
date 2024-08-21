@@ -121,6 +121,10 @@ int main() {
     bot.getEvents().onCallbackQuery(
         lesson::delete_lesson_reason_handler(bot)
     );
+    bot.getEvents().onCallbackQuery(
+        lesson::one_time_delete_lesson_handler(bot)
+    );
+
 
     
 

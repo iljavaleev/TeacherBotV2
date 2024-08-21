@@ -1,4 +1,5 @@
 #include "botstaff/utils/Utils.hpp"
+#include "botstaff/Vocabular.hpp"
 
 using namespace TgBot;
 
@@ -38,7 +39,7 @@ void send_message_with_kb(
     const TgBot::Bot& bot, 
     long chat_id, 
     const std::string& mess, 
-    TgBot::InlineKeyboardMarkup::Ptr kb,
+    InlineKeyboardMarkup::Ptr kb,
     const std::string& pm)
 {
 
@@ -85,35 +86,30 @@ void send_message(
 
 std::string get_teacher_info(const std::shared_ptr<BotUser>& u)
 {
-    return std::format(
-        "<b>{} {}</b>\n"
-        "<b>Username</b>: {}\n"
-        "<b>Phone number</b>: {}\n"
-        "<b>Email address</b>: {}\n"
-        "<b>Comments:</b> {}", 
-        u->first_name, 
+    return std::vformat(
+        utils_voc::_techer_info, 
+        std::make_format_args(u->first_name, 
         u->last_name, 
         u->tgusername, 
         u->phone, 
         u->email, 
-        u->comment
+        u->comment)
     );
 }
 
 
 std::string get_pupil_info(const std::shared_ptr<BotUser>& u)
 {
-    return std::format(
-        "<b><u>{} {}. Class: {}</u></b>\n<b><u>Username</u></b>: @{}\n"
-        "<b><u>Phone number</u></b>: {}\n<b><u>Email address</u></b>: {}\n"
-        "<b><u>Comments:</u></b> {}", 
+    return std::vformat(
+        utils_voc::_pupil_info,
+        std::make_format_args( 
         u->first_name, 
         u->last_name, 
         u->cls, 
         u->tgusername, 
         u->phone, 
         u->email, 
-        u->comment
+        u->comment)
     );
 }
 
@@ -130,9 +126,9 @@ void send_current_calendar(
         send_message_with_kb,
         std::ref(bot),
         chat_id,
-        std::format(
-            "<b><i>Schedule for {}</i></b>", 
-            MONTHS.at(ymd.month-1)
+        std::vformat(
+            utils_voc::_cal,
+            std::make_format_args(MONTHS.at(ymd.month-1))
         ),
         Keyboards::calendar_kb()(
             ymd,

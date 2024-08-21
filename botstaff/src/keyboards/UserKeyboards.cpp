@@ -19,7 +19,7 @@ namespace UserKeyboards
         vector<InlineKeyboardButton::Ptr> row;
  
         InlineKeyboardButton::Ptr register_btn(new InlineKeyboardButton);
-        register_btn->text = "Registration";
+        register_btn->text = keyboards_voc::user::_reg;
         register_btn->callbackData = "start_register";
         row.push_back(register_btn);
         keyboard->inlineKeyboard.push_back(row);
@@ -35,21 +35,21 @@ namespace UserKeyboards
         InlineKeyboardButton::Ptr reschedule_class_btn(
             new InlineKeyboardButton
         );
-        reschedule_class_btn->text = "List of class rescheduling";
+        reschedule_class_btn->text = keyboards_voc::user::_parent_resc;
         reschedule_class_btn->callbackData = "parent_reschedule";
         row.push_back(reschedule_class_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
         InlineKeyboardButton::Ptr comments_btn(new InlineKeyboardButton);
-        comments_btn->text = "List of teacher comments";
+        comments_btn->text = keyboards_voc::user::_parent_comm;
         comments_btn->callbackData = "parent_comments";
         row.push_back(comments_btn);
         keyboard->inlineKeyboard.push_back(row);
         row.clear();
 
         InlineKeyboardButton::Ptr debt_btn(new InlineKeyboardButton);
-        debt_btn->text = "Student debts";
+        debt_btn->text = keyboards_voc::user::_parent_debts;
         debt_btn->callbackData = "parent_debts";
         row.push_back(debt_btn);
         keyboard->inlineKeyboard.push_back(row);
@@ -63,17 +63,17 @@ namespace UserKeyboards
         vector<InlineKeyboardButton::Ptr> row;
 
         InlineKeyboardButton::Ptr pupil_btn(new InlineKeyboardButton);
-        pupil_btn->text = "Student";
+        pupil_btn->text = keyboards_voc::user::_role_std;
         pupil_btn->callbackData = "register_as 0";
         row.push_back(pupil_btn);
   
         InlineKeyboardButton::Ptr teacher_btn(new InlineKeyboardButton);
-        teacher_btn->text = "Teacher";
+        teacher_btn->text = keyboards_voc::user::_role_teach;
         teacher_btn->callbackData = "register_as 1";
         row.push_back(teacher_btn);
 
         InlineKeyboardButton::Ptr parent_btn(new InlineKeyboardButton);
-        parent_btn->text = "Parent";
+        parent_btn->text = keyboards_voc::user::_role_par;
         parent_btn->callbackData = "register_as 2";
         row.push_back(parent_btn);   
         
@@ -132,6 +132,20 @@ namespace UserKeyboards
             keyboard->inlineKeyboard.push_back(row);
             row.clear();
         }
+        return keyboard;
+    }
+    
+    InlineKeyboardMarkup::Ptr request_to_delete_kb(long lesson_id, long pupil_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        vector<InlineKeyboardButton::Ptr> row;
+
+        InlineKeyboardButton::Ptr delete_btn(new InlineKeyboardButton);
+        delete_btn->text = keyboards_voc::user::_delete;
+        delete_btn->callbackData = std::format(
+            "cancel_lesson {} {}", lesson_id, pupil_id);
+        row.push_back(delete_btn);
+        keyboard->inlineKeyboard.push_back(row);
         return keyboard;
     }
 }

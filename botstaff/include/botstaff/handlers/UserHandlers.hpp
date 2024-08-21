@@ -120,9 +120,6 @@ namespace user_register_handlers
         ):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
-
-   
-    
 }
 
 #endif

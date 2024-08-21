@@ -1,17 +1,19 @@
 #include "botstaff/FSM/LessonCreation.hpp"
 
+#ifdef EN 
+#define SIZE 1
+#endif
+#ifdef RU
+#define SIZE 2
+#endif
+
 
 using namespace TgBot;
 
 
 void CreateLesson::choose_date(const std::string& date)
 {   
-    filter_sender.send(
-        msg::create_lesson::check_date(
-            date,
-            messanger
-        )
-    );
+    filter_sender.send(msg::create_lesson::check_date(date, messanger));
 
     messanger.
     wait().
@@ -20,23 +22,12 @@ void CreateLesson::choose_date(const std::string& date)
     {
         state = &CreateLesson::choose_pupil;
         lesson->date = date;
-        try
-        {
-            bot.getApi().sendMessage(
+        send_message_with_kb(
+            bot, 
             lesson->teacher, 
-            lesson_messges::_pupil,
-            nullptr,
-            nullptr,
-            teacherKeyboards::create_pupil_for_lesson_kb(
-               lesson->teacher
-            ),
-            "HTML"
-        );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+            lesson_messges::_pupil, 
+            teacherKeyboards::create_pupil_for_lesson_kb(lesson->teacher));
+        
     }).
     handle<msg::create_lesson::date_fail>(
         [&](const msg::create_lesson::date_fail& msg)
@@ -44,7 +35,7 @@ void CreateLesson::choose_date(const std::string& date)
         send_error_message(
             bot, 
             lesson->teacher, 
-            "Error. Select today's date or a later date"
+            FSM_voc::lesson_voc::_date_fail
         );
     });  
 }
@@ -53,27 +44,12 @@ void CreateLesson::choose_pupil(const std::string& pupil)
 {   
     state = &CreateLesson::set_time;
     lesson->pupil = std::stol(pupil);
-    try
-    {
-        bot.getApi().sendMessage(
-        lesson->teacher, 
-        lesson_messges::_time
-    );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message(bot, lesson->teacher, lesson_messges::_time);
 }
 
 void CreateLesson::set_time(const std::string& time)
 {   
-    filter_sender.send(
-        msg::create_lesson::check_time(
-            time,
-            messanger
-        )
-    );
+    filter_sender.send(msg::create_lesson::check_time(time, messanger));
 
     messanger.
     wait().
@@ -82,22 +58,11 @@ void CreateLesson::set_time(const std::string& time)
     {
         state = &CreateLesson::set_objectives;
         lesson->time = time;
-        try
-        {
-            bot.getApi().sendMessage(
-            lesson->teacher, 
-            lesson_messges::_objectives
-        );
-        }
-        catch (std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }    
+        send_message(bot, lesson->teacher,  lesson_messges::_objectives);
     }).
     handle<msg::create_lesson::time_fail>(
         [&](const msg::create_lesson::time_fail& msg)
     {
-        
         send_error_message(
             bot, 
             lesson->teacher, 
@@ -110,60 +75,34 @@ void CreateLesson::set_time(const std::string& time)
 void CreateLesson::set_objectives(const std::string& objectives)
 {   
     state = &CreateLesson::comments_for_pupil;
-    if (objectives.size() > 1)
+    if (objectives.size() > SIZE)
         lesson->objectives = objectives;
-    try
-    {
-        bot.getApi().sendMessage(
-        lesson->teacher, 
-        lesson_messges::_comments_for_pupil
-    );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message(bot, lesson->teacher,  lesson_messges::_comments_for_pupil);
 }
 
 void CreateLesson::comments_for_pupil(const std::string& comments)
 {   
     state = &CreateLesson::comments_for_teacher;
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
         lesson->comment_for_pupil = comments;
-    try
-    {
-        bot.getApi().sendMessage(
-        lesson->teacher, 
-        lesson_messges::_comments_for_teacher
-    );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message(bot, lesson->teacher,  lesson_messges::_comments_for_teacher);
 }
 
 void CreateLesson::comments_for_teacher(const std::string& comments)
 {   
     state = &CreateLesson::comments_for_parent;
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
+    {   
+        std::cout << comments << " " << comments.size() << std::endl;
         lesson->comment_for_teacher = comments;
-    try
-    {
-        bot.getApi().sendMessage(
-        lesson->teacher, 
-        lesson_messges::_comments_for_parent
-    );
     }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+        
+    send_message(bot, lesson->teacher, lesson_messges::_comments_for_parent);
 }
 
 void CreateLesson::comments_for_parent(const std::string& comments)
 {   
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
         lesson->comment_for_parent = comments;
     long chat_id = lesson->teacher;
     try
@@ -184,18 +123,19 @@ void CreateLesson::comments_for_parent(const std::string& comments)
     {
         message = FSM_voc::lesson_voc::_comments_for_parent_fail;
     }
-        
-    try
-    {
-        bot.getApi().sendMessage(
-            chat_id, 
-            std::move(message)
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message(bot, chat_id, std::move(message));
+    send_message(
+        bot, 
+        lesson->pupil, 
+        std::vformat(
+            FSM_voc::lesson_voc::_get_info_for_pupil, 
+            std::make_format_args(
+                lesson->date, 
+                lesson->time, 
+                lesson->objectives, 
+                lesson->comment_for_pupil)
+        )
+    );
 }
 
 
@@ -220,37 +160,21 @@ void CreateLesson::run(const std::string& message)
 
 void UpdateLesson::send_update_kb()
 {
-    try
-    {
-        bot.getApi().sendMessage(
-            lesson_info->lesson->teacher, 
-            std::vformat(FSM_voc::lesson_voc::_send_update_kb, 
-                std::make_format_args(
-                    lesson_info->get_full_info()
-                )
-            ),
-            nullptr,
-            nullptr,
-            teacherKeyboards::update_lesson_info_kb(
-                lesson_info->lesson->id
-            ),
-            "HTML"
-        );
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }    
+    send_message_with_kb(
+        bot,
+        lesson_info->lesson->teacher, 
+        std::vformat(FSM_voc::lesson_voc::_send_update_kb, 
+            std::make_format_args(
+                lesson_info->get_full_info()
+            )
+        ),
+        teacherKeyboards::update_lesson_info_kb(lesson_info->lesson->id)
+    );
 }
 
 void UpdateLesson::choose_date(const std::string& date)
 {   
-    filter_sender.send(
-        msg::create_lesson::check_date(
-            date,
-            messanger
-        )
-    );
+    filter_sender.send(msg::create_lesson::check_date(date, messanger));
 
     messanger.
     wait().
@@ -279,12 +203,7 @@ void UpdateLesson::choose_pupil(const std::string& pupil)
 
 void UpdateLesson::set_time(const std::string& time)
 {   
-    filter_sender.send(
-        msg::create_lesson::check_time(
-            time,
-            messanger
-        )
-    );
+    filter_sender.send(msg::create_lesson::check_time(time, messanger));
 
     messanger.
     wait().
@@ -303,35 +222,35 @@ void UpdateLesson::set_time(const std::string& time)
 
 void UpdateLesson::set_objectives(const std::string& objectives)
 {   
-    if (objectives.size() > 1)
+    if (objectives.size() > SIZE)
         lesson_info->set_objectives(objectives);
     send_update_kb();
 }
 
 void UpdateLesson::comments_for_pupil(const std::string& comments)
 {   
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
         lesson_info->set_comment_for_pupil(comments);
     send_update_kb();
 }
 
 void UpdateLesson::comments_for_teacher(const std::string& comments)
 {   
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
         lesson_info->set_comment_for_teacher(comments);
     send_update_kb();
 }
 
 void UpdateLesson::comments_for_parent(const std::string& comments)
 {   
-    if(comments.size() > 1)
+    if(comments.size() > SIZE)
         lesson_info->set_comment_for_parent(comments);
     send_update_kb();
 }
 
 void UpdateLesson::is_paid(const std::string& is_paid)
 {   
-    if(is_paid == "y")
+    if(is_paid == FSM_voc::_change_status_y)
         lesson_info->set_is_paid(true);
     send_update_kb();
 }

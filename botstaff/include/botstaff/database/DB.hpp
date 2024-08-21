@@ -12,6 +12,7 @@
 #include <mutex>
 #include <tgbot/tgbot.h>
 #include "Quiries.hpp"
+#include "botstaff/Vocabular.hpp"
 
 enum class bot_roles{ pupil, teacher, parent, admin, anon, pupil_not_active, teacher_not_active };
 
@@ -324,7 +325,7 @@ struct LessonInfo
         comment_for_pupil = _lesson->comment_for_pupil;
         comment_for_teacher = _lesson->comment_for_teacher;
         comment_for_parent = _lesson->comment_for_parent;
-        is_paid = _lesson->is_paid ? "yes" : "no";
+        is_paid = _lesson->is_paid ? DB_voc::_yes : DB_voc::_no;
     }
     
     LessonInfo(int lesson_id): LessonInfo(UserLesson::get(lesson_id)){}

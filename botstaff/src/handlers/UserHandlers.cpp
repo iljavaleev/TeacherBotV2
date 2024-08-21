@@ -54,7 +54,7 @@ namespace user_handlers
                 send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id, 
-                "Choose role",
+                handlers_voc::user::_role,
                 UserKeyboards::choose_role_kb(),
                 "HTML"  
             );
@@ -119,7 +119,7 @@ namespace user_handlers
             send_message_with_kb,
             std::ref(bot),
             query->message->chat->id,
-            "<b><u>Select comment by date</u></b>",
+            handlers_voc::user::_parent_comments,
             UserKeyboards::parent_comments(query->message->chat->id),
             "HTML" 
         );
@@ -164,10 +164,11 @@ namespace user_handlers
             lesson_delete_request_message(lesson_id, teacher_id);
         
         std::thread send(
-            send_message,
+            send_message_with_kb,
             std::ref(bot),
             teacher_id,
             mess,
+            UserKeyboards::request_to_delete_kb(lesson_id, query->message->chat->id),
             "HTML" 
         );
 
@@ -175,7 +176,7 @@ namespace user_handlers
 
         return bot.getApi().sendMessage(
             query->message->chat->id, 
-            "We have sent your request to the teacher"
+            handlers_voc::user::_lesson_request
         );
     }
 }
@@ -240,7 +241,7 @@ namespace user_register_handlers
                     query->message->chat->username
                 );
             parent_registration_state.emplace(query->message->chat->id, pr);
-            mess = "Enter your child's email ";
+            mess = handlers_voc::user::_child_email;
         }
         else
         {
@@ -257,10 +258,10 @@ namespace user_register_handlers
             if (role == bot_roles::pupil)
             {
                 kb = UserKeyboards::create_list_teachers_kb();
-                mess = "<b>Choose your teacher</b>"; 
+                mess = handlers_voc::user::_choose_teacher; 
             }
             else
-                mess = "<b>Enter your name</b>";
+                mess = handlers_voc::user::_name;
         }   
         std::thread send(
             send_message_with_kb,
@@ -328,10 +329,8 @@ namespace user_register_handlers
                 send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id,
-                std::format(
-                    "<b><i>Choose field to update</i></b>\n{}", 
-                    user->get_full_info()
-                ),
+                std::vformat(handlers_voc::user::_update_user, 
+                    std::make_format_args(user->get_full_info())),
                 teacherKeyboards::update_user_info_kb(user->role),
                 "HTML" 
             );
@@ -415,6 +414,4 @@ namespace user_register_handlers
         
         return Message::Ptr(nullptr);
     }
-
-    
 }

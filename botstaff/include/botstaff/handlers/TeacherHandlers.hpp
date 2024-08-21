@@ -172,6 +172,13 @@ namespace lesson
         delete_lesson_reason_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
+
+    class one_time_delete_lesson_handler{
+        const TgBot::Bot& bot;
+    public:
+        one_time_delete_lesson_handler(const TgBot::Bot& _bot):bot(_bot){}
+        Message::Ptr operator()(const CallbackQuery::Ptr&);
+    };
 }
 
 

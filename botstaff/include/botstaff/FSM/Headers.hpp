@@ -11,6 +11,7 @@
 #include "botstaff/keyboards/Keyboards.hpp"
 #include "botstaff/database/DB.hpp"
 #include "botstaff/utils/CalendarUtils.hpp"
+#include "botstaff/utils/Utils.hpp"
 #include "botstaff/keyboards/TeacherKeyboards.hpp"
 
 #endif
