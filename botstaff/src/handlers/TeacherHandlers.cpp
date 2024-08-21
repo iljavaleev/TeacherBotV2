@@ -126,7 +126,7 @@ namespace teacher_handlers
         return Message::Ptr(nullptr);
     }
 
-     Message::Ptr change_payment_status_handler::operator()(
+    Message::Ptr change_payment_status_handler::operator()(
         const CallbackQuery::Ptr& query
     )
     {
@@ -140,21 +140,21 @@ namespace teacher_handlers
             if(answ == "yes")
             {
                 mess = handlers_voc::teacher::_change_debt_status;
+                try
+                {
+                    change_debt_status(lesson_id);
+                }
+                catch(const std::exception& e)
+                {
+                    std::cerr << e.what() << '\n';
+                    mess = handlers_voc::teacher::_error;
+                }
             }
             else
             {
                 mess = handlers_voc::teacher::_change_debt_status_not;
             };
-            try
-            {
-                change_debt_status(lesson_id);
-            }
-            catch(const std::exception& e)
-            {
-                std::cerr << e.what() << '\n';
-                mess = handlers_voc::teacher::_error;
-            }
-
+            
             std::thread send(
                 send_message,
                 std::ref(bot),
@@ -252,15 +252,17 @@ namespace teacher_handlers
                     kb = teacherKeyboards::create_pupils_list_kb(
                         teacher_id, true
                     );
-                    mess = kb->inlineKeyboard.empty() ? handlers_voc::teacher::_empty : 
-                         handlers_voc::teacher::_student_active;
+                    mess = kb->inlineKeyboard.empty() ? 
+                        handlers_voc::teacher::_empty : 
+                        handlers_voc::teacher::_student_active;
                 }
                 else
                 {   
                     kb = teacherKeyboards::create_pupils_list_kb(
                         teacher_id, false
                     );
-                    mess = kb->inlineKeyboard.empty() ? handlers_voc::teacher::_empty : 
+                    mess = kb->inlineKeyboard.empty() ? 
+                        handlers_voc::teacher::_empty : 
                         handlers_voc::teacher::_student_not_active;
                 }
                     
@@ -364,10 +366,11 @@ namespace lesson
     {
        if(!create_lesson_state.contains(message->chat->id))
             return Message::Ptr(nullptr);
+        
         std::shared_ptr<CreateLesson> ul = 
             create_lesson_state.at(message->chat->id);
 
-        std::thread t{&CreateLesson::run, ul, std::ref(message->text)};
+        std::thread t{&CreateLesson::run, ul, message->text};
         t.detach();
         
         return Message::Ptr(nullptr);
@@ -404,7 +407,6 @@ namespace lesson
         
         std::shared_ptr<CreateLesson> cl = 
             create_lesson_state.at(query->message->chat->id);
-
         std::string data = StringTools::split(query->data, ' ').at(1);
         std::thread t{&CreateLesson::run, cl, data};
         t.detach();
@@ -604,6 +606,45 @@ namespace lesson
                 "HTML"
             );
             send.detach();
+        }
+        return Message::Ptr(nullptr);
+    }
+
+    Message::Ptr one_time_delete_lesson_handler::operator()(
+        const CallbackQuery::Ptr& query
+    )
+    {
+        if(StringTools::split(query->data, ' ').at(0) == "cancel_lesson")
+        {   
+            
+            auto data = StringTools::split(query->data, ' ');
+            long lesson_id = std::stol(data.at(1));
+            long pupil_id = std::stol(data.at(2));
+            
+            try
+            {
+                std::shared_ptr<UserLesson> ul = UserLesson::destroy(lesson_id);
+                create_reschedule(ul->pupil, ul->date, "student_request");
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+            
+            std::thread send(
+                send_message,
+                std::ref(bot),
+                pupil_id, 
+                handlers_voc::teacher::_cancel_lesson_for_pupil,
+                "HTML"
+            );
+            send.detach();
+
+            send_message(
+                bot, 
+                query->message->chat->id, 
+                handlers_voc::teacher::_delete_lesson
+                );
         }
         return Message::Ptr(nullptr);
     }

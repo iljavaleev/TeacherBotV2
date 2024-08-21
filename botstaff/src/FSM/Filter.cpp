@@ -13,7 +13,11 @@ bool RegistrationFilter::name_is_ok(std::string name)
         return false; 
     
     if(!std::regex_match(name, std::regex(FSM_voc::filter_voc::_name_is_ok)))
+    {
+       
         return false;
+    }
+        
     
     return true;
 }
@@ -28,7 +32,7 @@ int RegistrationFilter::count_numbers(std::string& str, bool num_only)
     {
         if (nums.contains(*i)) 
             count++;
-        if (num_only)
+        else if (num_only)
             str.erase(i);
 
     }
@@ -37,8 +41,7 @@ int RegistrationFilter::count_numbers(std::string& str, bool num_only)
 
 bool RegistrationFilter::phone_is_valid(std::string& phone)
 {
-    if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$"))
-    )
+    if (!std::regex_match(phone, std::regex("^[0-9\\s()-]*$")))
     {   
         return false;
     }
@@ -53,7 +56,11 @@ std::shared_ptr<BotUser> RegistrationFilter::user_exist(
     auto users = BotUser::get_all(
         create_query(other_quiries::_student_exist, phone, email));
     if (!users.empty())
+    {   
+        printf("ssss\n");
         return users.at(0);
+    }
+        
     return nullptr;
 }
 
@@ -81,6 +88,7 @@ void RegistrationFilter::run()
                     }
                     else
                     {
+                        printf("aaa");
                         msg.queue.send(
                             msg::user_registration::first_name_fail()
                         );

@@ -179,8 +179,8 @@ namespace handlers
                 std::ref(bot),
                 query->message->chat->id,
                 kb->inlineKeyboard.empty() ? 
-                handlers_voc::handlers::_calendar_day : 
-                handlers_voc::handlers::_calendar_day_not,
+                handlers_voc::handlers::_calendar_day_not : 
+                handlers_voc::handlers::_calendar_day,
                 kb,
                 "HTML" 
             );

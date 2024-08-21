@@ -338,9 +338,9 @@ void UpdateUser::change_comment(const std::string& comment)
 
 void UpdateUser::change_active_status(const std::string& status)
 {
-    if(status == "y")
+    if(status == FSM_voc::_change_status_y)
         user->is_active = true;
-    else if(status == "n")
+    else if(status == FSM_voc::_change_status_n)
         user->is_active = false;
     else
     {

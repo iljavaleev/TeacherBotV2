@@ -134,4 +134,18 @@ namespace UserKeyboards
         }
         return keyboard;
     }
+    
+    InlineKeyboardMarkup::Ptr request_to_delete_kb(long lesson_id, long pupil_id)
+    {
+        InlineKeyboardMarkup::Ptr keyboard(new InlineKeyboardMarkup);
+        vector<InlineKeyboardButton::Ptr> row;
+
+        InlineKeyboardButton::Ptr delete_btn(new InlineKeyboardButton);
+        delete_btn->text = keyboards_voc::user::_delete;
+        delete_btn->callbackData = std::format(
+            "cancel_lesson {} {}", lesson_id, pupil_id);
+        row.push_back(delete_btn);
+        keyboard->inlineKeyboard.push_back(row);
+        return keyboard;
+    }
 }

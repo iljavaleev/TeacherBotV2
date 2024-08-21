@@ -54,7 +54,7 @@ namespace user_handlers
                 send_message_with_kb,
                 std::ref(bot),
                 query->message->chat->id, 
-                "Choose role",
+                handlers_voc::user::_role,
                 UserKeyboards::choose_role_kb(),
                 "HTML"  
             );
@@ -164,10 +164,11 @@ namespace user_handlers
             lesson_delete_request_message(lesson_id, teacher_id);
         
         std::thread send(
-            send_message,
+            send_message_with_kb,
             std::ref(bot),
             teacher_id,
             mess,
+            UserKeyboards::request_to_delete_kb(lesson_id, query->message->chat->id),
             "HTML" 
         );
 

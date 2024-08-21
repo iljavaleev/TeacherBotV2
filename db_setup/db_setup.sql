@@ -40,7 +40,7 @@ CREATE TABLE rescedule_table(
 
 CREATE TABLE user_lesson(
     id SERIAL PRIMARY KEY,
-    date date UNIQUE,
+    date date,
     time varchar(32) NOT NULL,
     teacher bigint,
     pupil bigint,
@@ -49,6 +49,7 @@ CREATE TABLE user_lesson(
     comment_for_teacher text,
     comment_for_parent text,
     is_paid boolean DEFAULT FALSE,
+    UNIQUE(teacher, pupil, date),
     FOREIGN KEY (pupil) REFERENCES bot_user (chat_id) ON DELETE CASCADE,
     FOREIGN KEY (teacher) REFERENCES bot_user (chat_id) ON DELETE CASCADE
 );
