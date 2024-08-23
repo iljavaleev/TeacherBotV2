@@ -65,8 +65,7 @@ void CreateLesson::set_time(const std::string& time)
     {
         send_error_message(
             bot, 
-            lesson->teacher, 
-            FSM_voc::lesson_voc::_date_fail
+            lesson->teacher
         );
 
     });  

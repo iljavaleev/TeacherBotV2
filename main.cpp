@@ -65,9 +65,9 @@ int main() {
     );
 
     bot.getEvents().onCallbackQuery(lesson::start_lesson_creation_handler(bot));
-    bot.getEvents().onNonCommandMessage(lesson::lesson_creation_handler(bot));
+    bot.getEvents().onNonCommandMessage(lesson::lesson_creation_handler());
     bot.getEvents().onNonCommandMessage(
-        lesson::get_message_data_for_lesson_update_handler(bot)
+        lesson::get_message_data_for_lesson_update_handler()
     );
     bot.getEvents().onNonCommandMessage(user_register_handlers::get_message_data_for_user_update_handler());
 
@@ -88,12 +88,12 @@ int main() {
     bot.getEvents().onCallbackQuery(handlers::calendar_day_handler(bot));
     bot.getEvents().onCallbackQuery(handlers::day_info_handler(bot));
     bot.getEvents().onCallbackQuery(
-        lesson::choose_pupil_for_lesson_creation_handler(bot)
+        lesson::choose_pupil_for_lesson_creation_handler()
     );
     bot.getEvents().onCallbackQuery(lesson::start_lesson_update_handler(bot));
     bot.getEvents().onCallbackQuery(lesson::lesson_update_state_handler(bot));
     bot.getEvents().onCallbackQuery(
-        lesson::get_query_data_for_lesson_update_handler(bot)
+        lesson::get_query_data_for_lesson_update_handler()
     );
     bot.getEvents().onCallbackQuery(
         lesson::delete_lesson_handler(bot)
