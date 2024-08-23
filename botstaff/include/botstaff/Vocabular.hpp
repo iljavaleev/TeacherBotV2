@@ -1,6 +1,5 @@
-#ifndef Vocabular_hpp
-#define Vocabular_hpp
-#include "botstaff/database/DB.hpp"
+#ifndef vocabular_hpp
+#define vocabular_hpp
 
 #include <vector>
 #include <string>
@@ -196,7 +195,7 @@ namespace handlers_voc
         inline std::string _update_user =  "Выберите поле для исправления\n{}";
         inline std::string _delete_lesson_reason = "Выберите причину отмены урока";
         inline std::string _delete_lesson = "Урок отменен";
-        inline std::string _cancel_lesson_for_pupil = "Ваш запрос одобрен";
+        inline std::string _cancel_lesson_for_pupil = "Ваш запрос одобрен. Урок отменен";
     };
 
     namespace user
@@ -309,13 +308,13 @@ namespace lesson_messges
     inline std::string _time = 
         "Установите время начала занятия (например 12 00, 12-00, и т.д)";
     inline std::string _objectives = 
-        "Установите тему занятия или отправьте любой символ, чтобы пропустить";
+        "Установите тему занятия или отправьте любую букву, чтобы пропустить";
     inline std::string _comments_for_pupil = 
-        "Введите информацию для ученика или отправьте любой символ, чтобы пропустить";
+        "Введите информацию для ученика или отправьте любую букву, чтобы пропустить";
     inline std::string _comments_for_parent = 
-        "Введите информацию для родителя или отправьте любой символ, чтобы пропустить";
+        "Введите информацию для родителя или отправьте любую букву, чтобы пропустить";
     inline std::string _comments_for_teacher = 
-        "Введите информацию для учителя или отправьте любой символ, чтобы пропустить";
+        "Введите информацию для учителя или отправьте любую букву, чтобы пропустить";
     inline std::string _paid = "Урок оплачен: д/н";
     inline std::string _finish = "Редактирование завершено";
 }
@@ -519,7 +518,7 @@ namespace handlers_voc
         inline std::string _update_user =  "Choose field to update\n{}";
         inline std::string _delete_lesson_reason = "Select the reason for canceling the lesson";
         inline std::string _delete_lesson = "You canceled your lesson";
-        inline std::string _cancel_lesson_for_pupil = "Your request has been approved";
+        inline std::string _cancel_lesson_for_pupil = "Your request has been approved. Lesson was cancelled";
     };
 
     namespace user

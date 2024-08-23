@@ -212,7 +212,7 @@ namespace messaging
         ~dispatcher() noexcept(false)
         {
             if(!chained)
-            {
+            {   
                 wait_and_dispatch();
             }
         }

@@ -1,6 +1,16 @@
 #include "botstaff/FSM/Filter.hpp"
-#include "botstaff/Vocabular.hpp"
-#include <regex>
+
+#include <stdio.h>                        
+#include <chrono>                         
+#include <compare>                        
+#include <regex>                         
+#include <unordered_set>                  
+#include <vector>             
+           
+#include "botstaff/FSM/Messages.hpp"      
+#include "botstaff/Vocabular.hpp"         
+#include "botstaff/database/Quiries.hpp"  
+#include "botstaff/utils/Utils.hpp"       
 
 using namespace TgBot;
 
@@ -18,7 +28,6 @@ bool RegistrationFilter::name_is_ok(std::string name)
         return false;
     }
         
-    
     return true;
 }
 
@@ -57,7 +66,6 @@ std::shared_ptr<BotUser> RegistrationFilter::user_exist(
         create_query(other_quiries::_student_exist, phone, email));
     if (!users.empty())
     {   
-        printf("ssss\n");
         return users.at(0);
     }
         
@@ -88,7 +96,6 @@ void RegistrationFilter::run()
                     }
                     else
                     {
-                        printf("aaa");
                         msg.queue.send(
                             msg::user_registration::first_name_fail()
                         );

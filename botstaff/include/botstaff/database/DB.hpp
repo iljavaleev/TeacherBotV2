@@ -6,13 +6,14 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <format>
+
+#include "Quiries.hpp"
 #include "botstaff/utils/Utils.hpp"
 #include "botstaff/utils/CalendarUtils.hpp"
-#include <format>
-#include <mutex>
-#include <tgbot/tgbot.h>
-#include "Quiries.hpp"
 #include "botstaff/Vocabular.hpp"
+
+#include <tgbot/tgbot.h>
 
 enum class bot_roles{ pupil, teacher, parent, admin, anon, pupil_not_active, teacher_not_active };
 
@@ -269,20 +270,6 @@ struct UserLesson{
     std::shared_ptr<UserLesson> destroy();
     std::shared_ptr<UserLesson> update();
     std::shared_ptr<UserLesson> create();
-
-    void print()
-    {
-        std::cout << id << std::endl;
-        std::cout << date << std::endl;
-        std::cout << time << std::endl;
-        std::cout << teacher << std::endl;
-        std::cout << pupil << std::endl;
-        std::cout << objectives << std::endl;
-        std::cout << comment_for_pupil << std::endl;
-        std::cout << comment_for_parent << std::endl;
-        std::cout << comment_for_teacher << std::endl;
-        std::cout << is_paid << std::endl;
-    }
 };
 
 struct LessonInfo
@@ -343,19 +330,7 @@ struct LessonInfo
     void set_comment_for_pupil(const std::string& comment_for_pupil);
     void set_comment_for_parent(const std::string& comment_for_parent);
     void set_comment_for_teacher(const std::string& comment_for_teacher);
-    void print()
-    {
-        std::cout << id << std::endl;
-        std::cout << date << std::endl;
-        std::cout << time << std::endl;
-        std::cout << teacher << std::endl;
-        std::cout << pupil << std::endl;
-        std::cout << objectives << std::endl;
-        std::cout << comment_for_pupil << std::endl;
-        std::cout << comment_for_parent << std::endl;
-        std::cout << comment_for_teacher << std::endl;
-        std::cout << is_paid << std::endl;
-    }
+
 };
 
 

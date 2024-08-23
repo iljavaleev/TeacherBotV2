@@ -11,6 +11,7 @@ src/FSM/LessonCreation.cpp
 src/FSM/UserRegistration.cpp
 src/handlers/TeacherHandlers.cpp
 src/handlers/UserHandlers.cpp
+src/States.cpp
 )
 
-target_include_directories(bot PUBLIC include) 
+target_include_directories(bot PUBLIC include)

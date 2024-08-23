@@ -1,21 +1,24 @@
 #ifndef Utils_hpp
 #define Utils_hpp
 
-#include <future>
-#include <type_traits>
-#include <thread>
-#include <chrono>
-#include <format>
+#include <chrono>                            
+#include <future>                              
+#include <memory>                              
+#include <string>                              
+#include <thread>                              
+#include <type_traits>                         
 #include <unordered_map>
-#include <tgbot/tgbot.h>
-#include <string>
 
-#include "botstaff/database/DB.hpp"
-#include "botstaff/keyboards/Keyboards.hpp"
 #include "botstaff/Vocabular.hpp"
+
+#include "tgbot/types/InlineKeyboardMarkup.h"  
+#include "tgbot/types/Message.h"               
 
 enum class bot_roles;
 struct BotUser;
+
+namespace TgBot { class Bot; }
+using namespace TgBot;
 
 inline std::shared_ptr<std::unordered_map<long, bot_roles>> roles(
     new std::unordered_map<long, bot_roles>()

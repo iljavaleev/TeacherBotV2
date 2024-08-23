@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(Boost_USE_MULTITHREADED ON)  
 
 set(PQXX /usr/local/include/pqxx)
+
 find_library(PQXX_LIB pqxx)
 
 find_package(Threads REQUIRED)

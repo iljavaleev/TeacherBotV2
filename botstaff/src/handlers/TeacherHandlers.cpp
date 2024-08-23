@@ -14,28 +14,7 @@
 using namespace TgBot;
 using namespace std;
 
-std::unordered_map<long, std::shared_ptr<CreateLesson>> 
-    create_lesson_state;
-std::unordered_map<long, std::shared_ptr<UpdateLesson>> 
-    update_lesson_state;
 extern RegistrationFilter rf;
-
-
-void clear_lesson_state(long user_id)
-{
-    if (create_lesson_state.contains(user_id))
-    {
-        create_lesson_state.erase(user_id);
-    }
-}
-
-void clear_lesson_update_state(long user_id)
-{
-    if (update_lesson_state.contains(user_id))
-    {
-        update_lesson_state.erase(user_id);
-    }
-}
 
 namespace teacher_handlers
 {   
@@ -364,11 +343,11 @@ namespace lesson
         const Message::Ptr& message
     )
     {
-       if(!create_lesson_state.contains(message->chat->id))
+       if(!State::create_lesson_state.contains(message->chat->id))
             return Message::Ptr(nullptr);
         
         std::shared_ptr<CreateLesson> ul = 
-            create_lesson_state.at(message->chat->id);
+            State::create_lesson_state.at(message->chat->id);
 
         std::thread t{&CreateLesson::run, ul, message->text};
         t.detach();
@@ -390,7 +369,7 @@ namespace lesson
             std::ref(bot), 
             query->message->chat->id
         );
-        create_lesson_state.emplace(query->message->chat->id, cl);        
+        State::create_lesson_state.emplace(query->message->chat->id, cl);        
         std::thread t{&CreateLesson::run, cl, data.at(1)};
         t.detach();
         return Message::Ptr(nullptr);
@@ -401,12 +380,12 @@ namespace lesson
     )
     {
         if(!StringTools::startsWith(query->data, "choose_pupil_for_lesson") || 
-            !create_lesson_state.contains(query->message->chat->id))
+            !State::create_lesson_state.contains(query->message->chat->id))
             return Message::Ptr(nullptr);
         
         
         std::shared_ptr<CreateLesson> cl = 
-            create_lesson_state.at(query->message->chat->id);
+            State::create_lesson_state.at(query->message->chat->id);
         std::string data = StringTools::split(query->data, ' ').at(1);
         std::thread t{&CreateLesson::run, cl, data};
         t.detach();
@@ -418,7 +397,7 @@ namespace lesson
     )
     {
         if(StringTools::split(query->data, ' ').at(0) == "update_lesson" && 
-            !update_lesson_state.contains(query->message->chat->id)
+            !State::update_lesson_state.contains(query->message->chat->id)
         )
         {
             
@@ -432,7 +411,7 @@ namespace lesson
                 std::ref(bot), 
                 lesson
             );
-            update_lesson_state.emplace(query->message->chat->id, ul);
+            State::update_lesson_state.emplace(query->message->chat->id, ul);
             
             std::thread send(
                 send_message_with_kb,
@@ -455,13 +434,13 @@ namespace lesson
     )
     {
         if (StringTools::startsWith(query->data, "update_lesson_field") 
-            && update_lesson_state.contains(query->message->chat->id)) 
+            && State::update_lesson_state.contains(query->message->chat->id)) 
         {
             std::string field = StringTools::split(query->data, ' ').at(1);
             long teacher_chat_id{query->message->chat->id};
             
             std::shared_ptr<UpdateLesson> cl = 
-                update_lesson_state.at(query->message->chat->id);
+                State::update_lesson_state.at(query->message->chat->id);
 
             InlineKeyboardMarkup::Ptr kb{nullptr};
             std::string mess = lesson_creation_messages.at(field);
@@ -470,8 +449,7 @@ namespace lesson
                 try
                 {   
                     cl->get_instance()->update();
-                    clear_lesson_update_state(teacher_chat_id);
-                    cl->done();
+                    State::clear_lesson_update_state(teacher_chat_id);
                 }
                 catch(const std::exception& e)
                 {
@@ -515,13 +493,13 @@ namespace lesson
         const Message::Ptr& message
     )
     {
-        if(!update_lesson_state.contains(message->chat->id))
+        if(!State::update_lesson_state.contains(message->chat->id))
         {
             return Message::Ptr(nullptr);
         }
             
         std::shared_ptr<UpdateLesson> ul = 
-            update_lesson_state.at(message->chat->id);
+            State::update_lesson_state.at(message->chat->id);
         std::thread t{&UpdateLesson::run, ul, message->text};
         t.detach();
         return Message::Ptr(nullptr);
@@ -531,12 +509,12 @@ namespace lesson
         const CallbackQuery::Ptr& query
     )
     {
-        if(!update_lesson_state.contains(query->message->chat->id) || 
+        if(!State::update_lesson_state.contains(query->message->chat->id) || 
             StringTools::endsWith(query->data, "for_lesson"))
             return Message::Ptr(nullptr);
         
         std::shared_ptr<UpdateLesson> ul = 
-            update_lesson_state.at(query->message->chat->id);
+            State::update_lesson_state.at(query->message->chat->id);
         auto data = StringTools::split(query->data, ' ');
         
         if (data.at(0) == "update_pupil_for_lesson")

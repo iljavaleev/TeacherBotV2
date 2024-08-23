@@ -93,7 +93,6 @@ void CreateLesson::comments_for_teacher(const std::string& comments)
     state = &CreateLesson::comments_for_parent;
     if(comments.size() > SIZE)
     {   
-        std::cout << comments << " " << comments.size() << std::endl;
         lesson->comment_for_teacher = comments;
     }
         
@@ -138,11 +137,6 @@ void CreateLesson::comments_for_parent(const std::string& comments)
     );
 }
 
-
-void CreateLesson::done()
-{
-    get_sender().send(messaging::close_queue());
-}
 
 void CreateLesson::run(const std::string& message) 
 {
@@ -255,10 +249,6 @@ void UpdateLesson::is_paid(const std::string& is_paid)
     send_update_kb();
 }
 
-void UpdateLesson::done()
-{
-    get_sender().send(messaging::close_queue());
-}
 
 void UpdateLesson::run(const std::string& message) 
 {

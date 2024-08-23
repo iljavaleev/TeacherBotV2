@@ -1,8 +1,9 @@
+#include <stdexcept>
+#include <sstream>
+
 #include "botstaff/database/DB.hpp"
 #include "botstaff/database/Quiries.hpp"
 #include "botstaff/Vocabular.hpp"
-#include <stdexcept>
-#include <sstream>
 
 static std::mutex bdmtx;
 using namespace TgBot;
