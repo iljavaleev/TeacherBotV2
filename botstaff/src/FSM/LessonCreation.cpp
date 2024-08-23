@@ -1,4 +1,5 @@
 #include "botstaff/FSM/LessonCreation.hpp"
+#include "botstaff/utils/Utils.hpp"
 
 #ifdef EN 
 #define SIZE 1
@@ -65,8 +66,7 @@ void CreateLesson::set_time(const std::string& time)
     {
         send_error_message(
             bot, 
-            lesson->teacher, 
-            FSM_voc::lesson_voc::_date_fail
+            lesson->teacher
         );
 
     });  
@@ -159,7 +159,7 @@ void UpdateLesson::send_update_kb()
         lesson_info->lesson->teacher, 
         std::vformat(FSM_voc::lesson_voc::_send_update_kb, 
             std::make_format_args(
-                lesson_info->get_full_info()
+                unmove(lesson_info->get_full_info())
             )
         ),
         teacherKeyboards::update_lesson_info_kb(lesson_info->lesson->id)

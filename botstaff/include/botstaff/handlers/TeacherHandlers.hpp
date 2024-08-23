@@ -100,9 +100,7 @@ namespace lesson
 {
     class lesson_creation_handler
     {
-        const TgBot::Bot& bot;
     public:
-        lesson_creation_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
     
@@ -117,10 +115,7 @@ namespace lesson
 
     class choose_pupil_for_lesson_creation_handler
     {
-        const TgBot::Bot& bot;
-    public:
-        choose_pupil_for_lesson_creation_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
+       public:
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
@@ -142,19 +137,14 @@ namespace lesson
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
-     class get_message_data_for_lesson_update_handler{
-        const TgBot::Bot& bot;
+    class get_message_data_for_lesson_update_handler{
     public:
-        get_message_data_for_lesson_update_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
 
-     class get_query_data_for_lesson_update_handler{
-        const TgBot::Bot& bot;
+    class get_query_data_for_lesson_update_handler{
     public:
-        get_query_data_for_lesson_update_handler(
-            const TgBot::Bot& _bot):bot(_bot){}
+    
         Message::Ptr operator()(const CallbackQuery::Ptr&);
     };
     

@@ -1,4 +1,5 @@
 #include "botstaff/FSM/UserRegistration.hpp"
+#include "botstaff/utils/Utils.hpp"
 
 using namespace TgBot;
 
@@ -199,7 +200,7 @@ void UpdateUser::send_update_kb()
         bot, 
         teacher_id,
         vformat(FSM_voc::user_reg_voc::_update_kb, std::make_format_args(
-            user->get_full_info())), 
+            unmove(user->get_full_info()))), 
         teacherKeyboards::update_user_info_kb(user->role)
     );
 }
