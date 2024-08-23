@@ -19,7 +19,7 @@ namespace other_quiries
     inline std::string _get_comments_for_kb = "SELECT l.id, TO_CHAR(l.date, \
     'dd/mm/yyyy'), u.first_name, u.last_name FROM user_lesson as l JOIN \
     bot_user as u ON l.pupil=u.chat_id WHERE l.teacher={}  AND  \
-    l.comment_for_teacher IS NOT NULL ORDER BY date DESC LIMIT 10;";
+    (l.comment_for_teacher = '') IS NOT TRUE ORDER BY date DESC LIMIT 10;";
 
     inline std::string _get_debts_for_kb = "SELECT l.id, TO_CHAR(l.date, \
     'dd/mm/yyyy'), u.first_name, u.last_name FROM user_lesson as l JOIN \

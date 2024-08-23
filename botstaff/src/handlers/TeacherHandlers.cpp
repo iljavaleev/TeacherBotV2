@@ -419,7 +419,7 @@ namespace lesson
                 query->message->chat->id,
                 std::vformat(
                     handlers_voc::teacher::_update_user, 
-                    std::make_format_args(lesson->get_full_info())
+                    std::make_format_args(unmove(lesson->get_full_info()))
                 ),
                 teacherKeyboards::update_lesson_info_kb(lesson_id),
                 "HTML" 

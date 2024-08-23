@@ -72,4 +72,9 @@ void send_error_message(
     std::string mess=utils_voc::_error);
 
 
+template<typename T>
+const T& unmove(T&& x)
+{
+    return x;
+}
 #endif

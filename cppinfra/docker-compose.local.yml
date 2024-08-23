@@ -34,7 +34,7 @@ services:
 
 
   cppbot:
-    image: valeevilja/cppbot:v1
+    image: valeevilja/cppbotasync:v1
     container_name: botcpp
     restart: always
     ports:

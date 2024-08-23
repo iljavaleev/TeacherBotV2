@@ -299,7 +299,7 @@ namespace user_register_handlers
                 std::ref(bot),
                 query->message->chat->id,
                 std::vformat(handlers_voc::user::_update_user, 
-                    std::make_format_args(user->get_full_info())),
+                    std::make_format_args(unmove(user->get_full_info()))),
                 teacherKeyboards::update_user_info_kb(user->role),
                 "HTML" 
             );

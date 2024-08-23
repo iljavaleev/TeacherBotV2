@@ -4,6 +4,7 @@
 #include "botstaff/database/DB.hpp"
 #include "botstaff/database/Quiries.hpp"
 #include "botstaff/Vocabular.hpp"
+#include "botstaff/utils/Utils.hpp"
 
 static std::mutex bdmtx;
 using namespace TgBot;
@@ -939,6 +940,8 @@ std::vector<std::shared_ptr<UserLesson>> get_parent_comments(long chat_id)
     return UserLesson::get_all(query);
 }
 
+ 
+
 std::string lesson_delete_request_message(long lesson_id, long& teacher_id)
 {
     std::string query = 
@@ -950,10 +953,10 @@ std::string lesson_delete_request_message(long lesson_id, long& teacher_id)
     
     return std::vformat(DB_voc::_lesson_delete_request_message, 
         std::make_format_args(
-                it->at(1).as<std::string>(),
-                it->at(2).as<std::string>(),
-                it->at(3).as<std::string>(),
-                it->at(4).as<std::string>()
+                unmove(it->at(1).as<std::string>()),
+                unmove(it->at(2).as<std::string>()),
+                unmove(it->at(3).as<std::string>()),
+                unmove(it->at(4).as<std::string>())
             )
         );
 }
