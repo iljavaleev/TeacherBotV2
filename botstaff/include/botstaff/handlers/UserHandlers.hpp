@@ -2,13 +2,11 @@
 #define UserHandlers_hpp
 
 #include <tgbot/tgbot.h>
+#include "botstaff/States.hpp"
 
 using namespace TgBot;
 using namespace std;
  
-void clear_user_state(long user_id);
-void clear_update_user_state(long user_id);
-void clear_parent_registration_state(long user_id);
 
 namespace user_handlers
 {   
@@ -59,17 +57,13 @@ namespace user_register_handlers
 {   
     class user_registration_handler
     {
-        const TgBot::Bot& bot;
     public:
-        user_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
 
     class parent_registration_handler
     {
-        const TgBot::Bot& bot;
     public:
-        parent_registration_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
 
@@ -83,17 +77,13 @@ namespace user_register_handlers
 
     class choose_teacher_for_register_handler
     {
-        const TgBot::Bot& bot;
     public:
-        choose_teacher_for_register_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
     class agree_handler
     {
-        const TgBot::Bot& bot;
     public:
-        agree_handler(const TgBot::Bot& _bot):bot(_bot){}
         Message::Ptr operator()(const CallbackQuery::Ptr& query);
     };
 
@@ -113,11 +103,7 @@ namespace user_register_handlers
 
     class get_message_data_for_user_update_handler
     {
-        const TgBot::Bot& bot;
     public:
-        get_message_data_for_user_update_handler(
-            const TgBot::Bot& _bot
-        ):bot(_bot){}
         Message::Ptr operator()(const Message::Ptr&);
     };
 }

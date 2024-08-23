@@ -1,10 +1,7 @@
 #ifndef UserKeyboards_hpp
 #define UserKeyboards_hpp
 
-#include <tgbot/tgbot.h>
-#include <string>
-#include "botstaff/database/DB.hpp"
-#include "botstaff/database/Quiries.hpp"
+#include "tgbot/types/InlineKeyboardMarkup.h"
 
 using namespace TgBot;
 

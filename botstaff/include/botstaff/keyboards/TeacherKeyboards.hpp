@@ -1,11 +1,11 @@
 #ifndef TeacherKeyboards_hpp
 #define TeacherKeyboards_hpp
 
-#include <tgbot/tgbot.h>
-#include <string>
+#include <memory>                              
+#include "tgbot/types/InlineKeyboardMarkup.h"  
 
-#include "botstaff/database/DB.hpp"
-#include "botstaff/database/Quiries.hpp"
+enum class bot_roles;
+struct BotUser;
 
 using namespace TgBot;
 

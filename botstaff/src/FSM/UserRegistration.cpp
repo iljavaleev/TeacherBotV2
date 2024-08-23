@@ -177,10 +177,6 @@ void UserRegistration::agreement(const std::string& choice)
     send_message(bot, chat_id, mess);
 }
 
-void UserRegistration::done()
-{
-    get_sender().send(messaging::close_queue());
-}
 
 void UserRegistration::run(const std::string& message) 
 {
@@ -350,10 +346,6 @@ void UpdateUser::change_active_status(const std::string& status)
     send_update_kb();
 }
 
-void UpdateUser::done()
-{
-    get_sender().send(messaging::close_queue());
-}
 
 void UpdateUser::run(const std::string& message) 
 {
@@ -565,11 +557,6 @@ void ParentRegistration::agreement(const std::string& choice)
     }
 
     send_message(bot, chat_id, mess);
-}
-
-void ParentRegistration::done()
-{
-    get_sender().send(messaging::close_queue());
 }
 
 void ParentRegistration::run(const std::string& message) 

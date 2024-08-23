@@ -1,16 +1,14 @@
 #include "botstaff/keyboards/TeacherKeyboards.hpp"
 
-#include <tgbot/tgbot.h>
-#include <vector>
-#include <utility>
-#include <format>
-#include <unordered_set>
-#include <iostream>
-#include <pqxx/pqxx>
+#include <format>                             
+#include <string>                              
+#include <vector>        
+                      
+#include "botstaff/Vocabular.hpp"              
+#include "botstaff/database/DB.hpp"            
+#include "botstaff/database/Quiries.hpp"
 
-#include "botstaff/database/DB.hpp"
-#include "botstaff/Vocabular.hpp"
-
+#include "tgbot/types/InlineKeyboardButton.h"  
 
 using namespace std;
 using namespace TgBot;

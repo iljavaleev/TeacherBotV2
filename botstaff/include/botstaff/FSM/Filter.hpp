@@ -1,12 +1,15 @@
 #ifndef Filter_hpp
 #define Filter_hpp
 
-#include <regex>
+#include <memory>                    
+#include <string>
 
-#include "Headers.hpp"
+#include "botstaff/FSM/FSM.hpp"      
+#include "botstaff/database/DB.hpp"
+
+#include "tgbot/TgException.h"       
 
 using namespace TgBot;
-
 
 class RegistrationFilter
 {

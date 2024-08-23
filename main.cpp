@@ -1,18 +1,22 @@
 #include <stdio.h>
-#include <tgbot/tgbot.h>
 #include <memory>
 #include <functional>
-#include <exception>
 #include <cstdlib>
 #include <format>
 #include <string>
 #include <thread>
+#include <sys/signal.h>                          
+#include <vector>
 
 #include "botstaff/handlers/Handlers.hpp"
 #include "botstaff/handlers/TeacherHandlers.hpp"
 #include "botstaff/handlers/UserHandlers.hpp"
 #include "botstaff/FSM/Filter.hpp"
-
+              
+#include "tgbot/Api.h"                          
+#include "tgbot/Bot.h"                           
+#include "tgbot/EventBroadcaster.h"  
+#include "tgbot/types/BotCommand.h" 
 
 using namespace TgBot;
 using namespace std;
@@ -51,13 +55,13 @@ int main() {
     bot.getEvents().onCommand("cancel", command_handlers::cancel_command(bot));
     bot.getEvents().onCallbackQuery(user_handlers::user_start_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::start_register_handler(bot));
-    bot.getEvents().onNonCommandMessage(user_register_handlers::user_registration_handler(bot));
-    bot.getEvents().onNonCommandMessage(user_register_handlers::parent_registration_handler(bot));
-    bot.getEvents().onCallbackQuery(user_register_handlers::agree_handler(bot));
+    bot.getEvents().onNonCommandMessage(user_register_handlers::user_registration_handler());
+    bot.getEvents().onNonCommandMessage(user_register_handlers::parent_registration_handler());
+    bot.getEvents().onCallbackQuery(user_register_handlers::agree_handler());
     bot.getEvents().onCallbackQuery(user_register_handlers::user_update_state_handler(bot));
     bot.getEvents().onCallbackQuery(user_register_handlers::start_user_update_handler(bot));
     bot.getEvents().onCallbackQuery(
-        user_register_handlers::choose_teacher_for_register_handler(bot)
+        user_register_handlers::choose_teacher_for_register_handler()
     );
 
     bot.getEvents().onCallbackQuery(lesson::start_lesson_creation_handler(bot));
@@ -65,7 +69,7 @@ int main() {
     bot.getEvents().onNonCommandMessage(
         lesson::get_message_data_for_lesson_update_handler(bot)
     );
-    bot.getEvents().onNonCommandMessage(user_register_handlers::get_message_data_for_user_update_handler(bot));
+    bot.getEvents().onNonCommandMessage(user_register_handlers::get_message_data_for_user_update_handler());
 
     bot.getEvents().onCallbackQuery(teacher_handlers::list_active_not_handler(bot));
     bot.getEvents().onCallbackQuery(teacher_handlers::list_all_teachers_handler(bot));

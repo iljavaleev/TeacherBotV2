@@ -2,12 +2,11 @@
 #define TeacherHandlers_hpp
 
 #include <tgbot/tgbot.h>
+#include "botstaff/States.hpp"
 
 using namespace TgBot;
 using namespace std;
 
-void clear_lesson_state(long user_id);
-void clear_lesson_update_state(long user_id);
 
 namespace teacher_handlers
 {

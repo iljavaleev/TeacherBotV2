@@ -55,7 +55,6 @@ public:
         lesson->teacher = chat_id;
         state = &CreateLesson::choose_date;
     }
-    void done();
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }
 };
@@ -101,7 +100,6 @@ public:
     { 
         return lesson_info->lesson; 
     }
-    void done();
     void change_state(const std::string& message);
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }

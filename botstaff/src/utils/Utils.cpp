@@ -1,5 +1,20 @@
 #include "botstaff/utils/Utils.hpp"
-#include "botstaff/Vocabular.hpp"
+
+#include <sstream>                  
+#include <exception>                         
+#include <format>                           
+#include <functional>                        
+#include <iostream>                          
+#include <sstream>                          
+#include <vector>                            
+
+#include "botstaff/Vocabular.hpp"            
+#include "botstaff/database/DB.hpp"         
+#include "botstaff/keyboards/Keyboards.hpp"  
+#include "botstaff/utils/CalendarUtils.hpp"  
+
+#include "tgbot/Api.h"                       
+#include "tgbot/Bot.h"
 
 using namespace TgBot;
 

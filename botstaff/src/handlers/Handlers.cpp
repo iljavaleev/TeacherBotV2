@@ -1,27 +1,29 @@
 #include "botstaff/handlers/Handlers.hpp"
+#include <stdio.h>                                  
+#include <exception>                                
+#include <format>                                   
+#include <functional>                              
+#include <memory>                                   
+#include <string>                                  
+#include <thread>                                   
+#include <vector>        
+                          
+#include "botstaff/States.hpp"                      
+#include "botstaff/Vocabular.hpp"                  
+#include "botstaff/database/DB.hpp"                 
+#include "botstaff/keyboards/Keyboards.hpp"         
+#include "botstaff/keyboards/TeacherKeyboards.hpp"  
+#include "botstaff/keyboards/UserKeyboards.hpp"     
+#include "botstaff/utils/CalendarUtils.hpp"        
+#include "botstaff/utils/Utils.hpp" 
 
-#include <unordered_map>
-#include <string>
-#include <exception>
-#include <iostream>
-#include <memory>
-#include <future>
-#include <thread>
-
-#include "botstaff/FSM/LessonCreation.hpp"
-#include "botstaff/FSM/UserRegistration.hpp"
-#include "botstaff/FSM/Filter.hpp"
-#include "botstaff/keyboards/Keyboards.hpp"
-#include "botstaff/keyboards/TeacherKeyboards.hpp"
-#include "botstaff/keyboards/UserKeyboards.hpp"
-#include "botstaff/utils/Utils.hpp"
-#include "botstaff/Vocabular.hpp"
-
-#include <thread>
-
-#include <tgbot/tgbot.h>
-#include "botstaff/handlers/TeacherHandlers.hpp"
-#include "botstaff/handlers/UserHandlers.hpp"
+#include "tgbot/Api.h"                              
+#include "tgbot/Bot.h"                              
+#include "tgbot/net/TgWebhookTcpServer.h"           
+#include "tgbot/tools/StringTools.h"                
+#include "tgbot/types/Chat.h"                       
+#include "tgbot/types/InlineKeyboardMarkup.h"       
+#include "tgbot/types/User.h"                       
 
 using namespace TgBot;
 
@@ -31,11 +33,7 @@ namespace command_handlers
     Message::Ptr start_command::operator()(const Message::Ptr& message)
     {
         long chat_id(message->chat->id);
-        clear_user_state(chat_id);
-        clear_update_user_state(chat_id);
-        clear_lesson_state(chat_id);
-        clear_lesson_update_state(chat_id);
-        clear_parent_registration_state(chat_id);
+        State::clear_all_states(chat_id);
         bot_roles role = get_role(chat_id);
         
         std::string mes{};
@@ -89,11 +87,7 @@ namespace command_handlers
     Message::Ptr cancel_command::operator()(const Message::Ptr& message)
     {
         long chat_id(message->chat->id);
-        clear_user_state(chat_id);
-        clear_update_user_state(chat_id);
-        clear_lesson_state(chat_id);
-        clear_lesson_update_state(chat_id);
-        clear_parent_registration_state(chat_id);
+        State::clear_all_states(chat_id);
         std::thread send(
             send_message,
             std::ref(bot), 

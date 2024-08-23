@@ -59,7 +59,6 @@ public:
             state = &UserRegistration::get_first_name;
     }
 
-    void done();
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }
 };
@@ -106,7 +105,7 @@ public:
     { 
         return user; 
     }
-    void done();
+    
     void change_state(const std::string& message);
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }
@@ -152,7 +151,6 @@ public:
         state = &ParentRegistration::get_child_email;
     }
 
-    void done();
     void run(const std::string& message);
     messaging::sender get_sender(){ return messanger; }
 };

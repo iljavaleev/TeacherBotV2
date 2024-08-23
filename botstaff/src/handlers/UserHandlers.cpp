@@ -11,38 +11,7 @@
 using namespace TgBot;
 using namespace std;
 
-std::unordered_map<long, std::shared_ptr<UserRegistration>> 
-    user_registration_state;
-std::unordered_map<long, std::shared_ptr<UpdateUser>> 
-    user_update_state;
-std::unordered_map<long, std::shared_ptr<ParentRegistration>> 
-    parent_registration_state;
 extern RegistrationFilter rf;
-
-
-void clear_user_state(long user_id)
-{
-    if (user_registration_state.contains(user_id))
-    {
-        user_registration_state.erase(user_id);
-    }
-}
-
-void clear_update_user_state(long user_id)
-{
-    if (user_update_state.contains(user_id))
-    {
-        user_update_state.erase(user_id);
-    }
-}
-
-void clear_parent_registration_state(long user_id)
-{
-     if (parent_registration_state.contains(user_id))
-    {
-        parent_registration_state.erase(user_id);
-    }
-}
 
 namespace user_handlers
 {
@@ -187,10 +156,10 @@ namespace user_register_handlers
         const Message::Ptr& message
     )
     {
-        if(!user_registration_state.contains(message->chat->id))
+        if(!State::user_registration_state.contains(message->chat->id))
             return Message::Ptr(nullptr);
         std::shared_ptr<UserRegistration> ur = 
-            user_registration_state.at(message->chat->id);
+            State::user_registration_state.at(message->chat->id);
 
         std::thread t{&UserRegistration::run, ur, message->text};
         t.detach();
@@ -202,14 +171,14 @@ namespace user_register_handlers
         const CallbackQuery::Ptr& query
     )
     {
-        if(user_registration_state.contains(query->message->chat->id) && 
+        if(State::user_registration_state.contains(query->message->chat->id) && 
             StringTools::startsWith(query->data, "register_pupil"))
         { 
             std::string teacher_id = 
                 StringTools::split(query->data, ' ').at(1);
             
             std::shared_ptr<UserRegistration> ur = 
-                user_registration_state.at(query->message->chat->id);
+                State::user_registration_state.at(query->message->chat->id);
 
             std::thread t{&UserRegistration::run, ur, teacher_id};
             t.detach();
@@ -240,7 +209,7 @@ namespace user_register_handlers
                     query->message->chat->id, 
                     query->message->chat->username
                 );
-            parent_registration_state.emplace(query->message->chat->id, pr);
+            State::parent_registration_state.emplace(query->message->chat->id, pr);
             mess = handlers_voc::user::_child_email;
         }
         else
@@ -253,7 +222,7 @@ namespace user_register_handlers
                     query->message->chat->username,
                     role
                 );
-            user_registration_state.emplace(query->message->chat->id, ur);
+            State::user_registration_state.emplace(query->message->chat->id, ur);
 
             if (role == bot_roles::pupil)
             {
@@ -285,21 +254,21 @@ namespace user_register_handlers
        
         std::string answ = StringTools::split(query->data, ' ').at(1);   
         
-        if (user_registration_state.contains(query->message->chat->id))
+        if (State::user_registration_state.contains(query->message->chat->id))
         {
             std::shared_ptr<UserRegistration> reg = 
-                user_registration_state.at(query->message->chat->id);
+                State::user_registration_state.at(query->message->chat->id);
             std::thread t{&UserRegistration::run, reg, answ};
             t.join();
-            user_registration_state.erase(query->message->chat->id);
+            State::user_registration_state.erase(query->message->chat->id);
         }
         else
         {
             std::shared_ptr<ParentRegistration> reg = 
-                parent_registration_state.at(query->message->chat->id);
+                State::parent_registration_state.at(query->message->chat->id);
             std::thread t{&ParentRegistration::run, reg, answ};
             t.join();
-            parent_registration_state.erase(query->message->chat->id);
+            State::parent_registration_state.erase(query->message->chat->id);
         } 
         return Message::Ptr(nullptr); 
     }
@@ -310,7 +279,7 @@ namespace user_register_handlers
     )
     {
         if(StringTools::split(query->data, ' ').at(0) == "update_user" && 
-            !user_update_state.contains(query->message->chat->id)
+            !State::user_update_state.contains(query->message->chat->id)
         )
         {
             long user_id = std::stol(
@@ -323,7 +292,7 @@ namespace user_register_handlers
                 user,
                 query->message->chat->id
             );
-            user_update_state.emplace(query->message->chat->id, uu);
+            State::user_update_state.emplace(query->message->chat->id, uu);
             
             std::thread send(
                 send_message_with_kb,
@@ -344,13 +313,13 @@ namespace user_register_handlers
     )
     {
         if (StringTools::startsWith(query->data, "update_user_field") 
-            && user_update_state.contains(query->message->chat->id)) 
+            && State::user_update_state.contains(query->message->chat->id)) 
         {
             std::string field = StringTools::split(query->data, ' ').at(1);
             long teacher_chat_id{query->message->chat->id};
             
             std::shared_ptr<UpdateUser> uu = 
-                user_update_state.at(query->message->chat->id);
+                State::user_update_state.at(query->message->chat->id);
 
             InlineKeyboardMarkup::Ptr kb{nullptr};
             std::string mess = user_update_messages.at(field);
@@ -359,8 +328,7 @@ namespace user_register_handlers
                 try
                 {   
                     uu->get_instance()->update();
-                    clear_update_user_state(teacher_chat_id);
-                    uu->done();
+                    State::clear_update_user_state(teacher_chat_id);
                 }
                 catch(const std::exception& e)
                 {
@@ -387,13 +355,13 @@ namespace user_register_handlers
         const Message::Ptr& message
     )
     {
-        if(!user_update_state.contains(message->chat->id))
+        if(!State::user_update_state.contains(message->chat->id))
         {
             return Message::Ptr(nullptr);
         }
            
         std::shared_ptr<UpdateUser> uu = 
-            user_update_state.at(message->chat->id);
+            State::user_update_state.at(message->chat->id);
         std::thread t{&UpdateUser::run, uu, message->text};
         t.detach();
         return Message::Ptr(nullptr);
@@ -404,10 +372,10 @@ namespace user_register_handlers
         const Message::Ptr& message
     )
     {
-        if(!parent_registration_state.contains(message->chat->id))
+        if(!State::parent_registration_state.contains(message->chat->id))
             return Message::Ptr(nullptr);
         std::shared_ptr<ParentRegistration> ur = 
-            parent_registration_state.at(message->chat->id);
+            State::parent_registration_state.at(message->chat->id);
 
         std::thread t{&ParentRegistration::run, ur, message->text};
         t.detach();

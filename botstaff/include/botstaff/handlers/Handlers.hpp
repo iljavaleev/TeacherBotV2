@@ -1,11 +1,15 @@
 #ifndef Handlers_hpp
 #define Handlers_hpp
 
-#include <tgbot/tgbot.h>
+#include <string>
+
+#include "tgbot/types/CallbackQuery.h" 
+#include "tgbot/types/Message.h"
+
+namespace TgBot { class Bot; }
 
 using namespace TgBot;
 using namespace std;
-
 
 namespace command_handlers
 {
