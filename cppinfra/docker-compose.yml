@@ -23,7 +23,7 @@ services:
 
 
   cppbot:
-    image: valeevilja/cppbotaync:v1
+    image: valeevilja/cppbotasync:v1
     container_name: cppbot
     restart: always
     ports:
